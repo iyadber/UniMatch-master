@@ -1,0 +1,18 @@
+{
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "builds": [
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "PRISMA_GENERATE_DATAPROXY": "false",
+    "VERCEL": "1",
+    "NODE_ENV": "production",
+    "MONGODB_VERSION": "5.0",
+    "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+  }
+} 

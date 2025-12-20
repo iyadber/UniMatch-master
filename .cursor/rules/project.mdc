@@ -1,0 +1,60 @@
+---
+description: this show what is the project and how it should be
+globs: 
+---
+
+Project Name: UniMatch.
+
+Main Idea: A platform that connects students seeking specialized academic support with unemployed PhD researchers looking for flexible teaching opportunities.
+
+2. Objective of the Site
+
+For Students: Providing an easy-to-use platform that enables them to find specialized tutors to support them academically.
+
+For Teachers: Providing a flexible teaching opportunity with a financial income that helps them in their academic journey.
+
+3. Basic Functions of the Site
+
+User Interface (UI):
+
+Login/Create an account for students and teachers.
+
+A dedicated dashboard for each user.
+
+Matching System:
+
+Based on specialization, subjects, and students’ needs.
+
+A smart algorithm that connects students with suitable tutors.
+
+Session Management:
+
+Book individual or group sessions.
+
+Session Schedule.
+
+Evaluation System after the session ends.
+
+Electronic Payment:
+
+Easy and secure payment methods (cards, bank transfer).
+
+Communication:
+
+A live chat system between students and teachers.
+
+Notifications of appointments and updates.
+
+4. Required technical features
+
+Design responsiveness: The site should be compatible with computers and mobile phones.
+
+Data security: Encrypt user data and protect payments.
+
+Account management: Easy interface to manage student and teacher accounts.
+
+5. Required design (UI/UX):
+
+Preferred colors: Pink and blue (for a comfortable and modern touch).
+
+Simple and easy to navigate design.
