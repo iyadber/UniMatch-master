@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('query') || '';
     const category = searchParams.get('category') || '';
@@ -35,15 +40,21 @@ export async function GET(request: Request) {
             image: true
           }
         },
-        enrollments: {
+        _count: {
           select: {
-            id: true
+            enrollments: true,
+            lessons: true
           }
         },
-        lessons: {
+        // Only fetch enrollment for current user to check if enrolled
+        enrollments: {
+          where: {
+            studentId: userId || 'no-user-id'
+          },
           select: {
             id: true
-          }
+          },
+          take: 1
         }
       }
     });
@@ -61,9 +72,10 @@ export async function GET(request: Request) {
         name: course.teacher?.name || 'Unknown Teacher',
         image: course.teacher?.image || null
       },
+      isEnrolled: course.enrollments.length > 0,
       _count: {
-        enrollments: course.enrollments.length,
-        lessons: course.lessons.length
+        enrollments: course._count.enrollments,
+        lessons: course._count.lessons
       }
     }));
 

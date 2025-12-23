@@ -15,7 +15,7 @@ interface RouteContext {
 async function ensurePublicUploadDir() {
   const publicDir = path.join(process.cwd(), 'public');
   const uploadsDir = path.join(publicDir, 'uploads', 'pdfs');
-  
+
   // This would typically use fs.mkdir with recursive: true
   // but for simplicity in this example, we assume the directory exists
   return uploadsDir;
@@ -34,11 +34,24 @@ export async function GET(
     const params = await context.params;
     const { courseId } = params;
 
-    // Check if course exists and user is the teacher
+    // Check if course exists and user is the teacher OR enrolled student
     const course = await prisma.course.findFirst({
       where: {
         id: courseId,
-        teacherId: session.user.role === 'admin' ? undefined : session.user.id
+        OR: [
+          // Admin can access any course
+          ...(session.user.role === 'admin' ? [{}] : []),
+          // Teacher who owns the course
+          { teacherId: session.user.id },
+          // Student enrolled in the course
+          {
+            enrollments: {
+              some: {
+                studentId: session.user.id
+              }
+            }
+          }
+        ]
       }
     });
 
@@ -64,7 +77,7 @@ export async function GET(
     const transformedPdfs = pdfs.map((pdf) => {
       // Extract the URL from the content field
       const url = pdf.content.replace('PDF:', '');
-      
+
       return {
         _id: pdf.id,
         title: pdf.title,
@@ -128,17 +141,17 @@ export async function POST(
 
     // Get file buffer
     const buffer = Buffer.from(await file.arrayBuffer());
-    
+
     // Generate a unique filename
     const fileName = `${uuidv4()}-${file.name.replace(/\s/g, '_')}`;
-    
+
     // Upload to Cloudinary instead of local file system
     const fileUrl = await uploadToCloudinary(buffer, {
-      public_id: fileName.split('.')[0], 
+      public_id: fileName.split('.')[0],
       resource_type: 'raw',
       folder: 'pdfs'
     });
-    
+
     // Save to database - using Lesson model as a temporary solution
     const pdf = await prisma.lesson.create({
       data: {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, BookOpen, Users, GraduationCap, ChevronRight, Filter } from 'lucide-react';
+import { Search, BookOpen, Users, GraduationCap, ChevronRight, Filter, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/Input';
@@ -20,6 +20,7 @@ interface Course {
   category: string;
   price: number;
   status: 'active' | 'draft' | 'archived';
+  isEnrolled?: boolean;
   teacher: {
     name: string;
     image?: string;
@@ -72,10 +73,10 @@ export default function CoursesPage() {
       try {
         setIsLoading(true);
         setError('');
-        
+
         const url = `/api/courses/available?query=${encodeURIComponent(searchQuery)}&category=${encodeURIComponent(selectedCategory !== 'All' ? selectedCategory : '')}`;
         const response = await fetch(url);
-        
+
         if (!response.ok) {
           let errorMessage = `Failed to fetch courses (${response.status})`;
           try {
@@ -88,13 +89,13 @@ export default function CoursesPage() {
           }
           throw new Error(errorMessage);
         }
-        
+
         const data = await response.json();
-        
+
         if (!Array.isArray(data)) {
           throw new Error('Invalid response format: expected an array of courses');
         }
-        
+
         setCourses(data);
       } catch (err) {
         console.error('Error fetching courses:', err);
@@ -134,6 +135,20 @@ export default function CoursesPage() {
         throw new Error(errorData?.message || 'Failed to enroll in course');
       }
 
+      // Update local state to reflect enrollment immediately
+      setCourses(prevCourses => prevCourses.map(course =>
+        course.id === courseId
+          ? {
+            ...course,
+            isEnrolled: true,
+            _count: {
+              ...course._count,
+              enrollments: course._count.enrollments + 1
+            }
+          }
+          : course
+      ));
+
       toast.success('Successfully enrolled in course');
     } catch (err) {
       console.error('Enrollment error:', err);
@@ -144,13 +159,13 @@ export default function CoursesPage() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center space-y-4"
@@ -159,14 +174,14 @@ export default function CoursesPage() {
             Explore Courses
           </h1>
           <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-            Discover a wide range of courses taught by expert instructors. 
+            Discover a wide range of courses taught by expert instructors.
             Enhance your knowledge and skills with our comprehensive learning materials.
           </p>
         </motion.div>
 
         {/* Search and Filter */}
         <div className="grid gap-6 md:grid-cols-[240px,1fr]">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="space-y-6"
@@ -200,7 +215,7 @@ export default function CoursesPage() {
           </motion.div>
 
           <div className="space-y-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="relative"
@@ -246,11 +261,11 @@ export default function CoursesPage() {
                   className="text-center py-12"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.1, 1],
                       rotate: [0, 5, -5, 0]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       repeatType: "reverse"
@@ -344,14 +359,24 @@ export default function CoursesPage() {
                           </div>
                           <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                             <Button
-                              onClick={() => handleEnroll(course.id)}
-                              disabled={enrollingCourseId === course.id}
-                              className="w-full bg-gradient-to-r from-pink-600 to-blue-600 hover:from-pink-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                              onClick={() => !course.isEnrolled && handleEnroll(course.id)}
+                              disabled={enrollingCourseId === course.id || course.isEnrolled}
+                              className={cn(
+                                "w-full shadow-lg hover:shadow-xl transition-all duration-200",
+                                course.isEnrolled
+                                  ? "bg-green-100 text-white hover:bg-green-200 dark:bg-green-900/30 dark:text-white dark:hover:bg-green-900/50 border border-green-200 dark:border-green-800"
+                                  : "bg-gradient-to-r from-pink-600 to-blue-600 hover:from-pink-700 hover:to-blue-700 text-white"
+                              )}
                             >
                               {enrollingCourseId === course.id ? (
                                 <>
                                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
                                   Enrolling...
+                                </>
+                              ) : course.isEnrolled ? (
+                                <>
+                                  Enrolled
+                                  <Check className="w-4 h-4 ml-2" />
                                 </>
                               ) : (
                                 <>

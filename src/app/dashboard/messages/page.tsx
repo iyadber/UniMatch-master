@@ -1,27 +1,26 @@
 'use client';
 
-import { useState, useRef, useEffect, KeyboardEvent } from 'react';
+import { useState, useRef, useEffect, KeyboardEvent, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 import {
   Search,
   Send,
-  User,
   Phone,
   Video,
   MoreVertical,
   Smile,
   Paperclip,
-  Image,
-  Mic,
   Check,
   CheckCheck,
   Clock,
   ArrowLeft,
-  Star,
   MessageSquare,
   Circle,
   Settings,
-  Plus
+  Plus,
+  Loader2,
+  UserPlus
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,104 +31,31 @@ interface Message {
   id: string;
   content: string;
   senderId: string;
-  timestamp: Date;
-  status: 'sending' | 'sent' | 'delivered' | 'read';
-  type: 'text' | 'image' | 'file';
+  receiverId: string;
+  createdAt: string;
+  read: boolean;
+  status?: string;
+  attachments?: Array<{ url: string; type: string; name: string }>;
 }
 
 interface Contact {
   id: string;
   name: string;
-  avatar?: string;
+  email?: string;
+  avatar?: string | null;
   role: string;
-  lastMessage?: string;
-  lastMessageTime?: Date;
+  lastMessage?: string | null;
+  lastMessageTime?: string | null;
   unreadCount: number;
   isOnline: boolean;
   isTyping?: boolean;
 }
 
-// Mock contacts data
-const mockContacts: Contact[] = [
-  {
-    id: '1',
-    name: 'Dr. Sarah Wilson',
-    role: 'Mathematics Tutor',
-    lastMessage: 'Great progress on your calculus work!',
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 5),
-    unreadCount: 2,
-    isOnline: true,
-  },
-  {
-    id: '2',
-    name: 'Prof. Michael Chen',
-    role: 'Computer Science Tutor',
-    lastMessage: 'The code looks much better now',
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 30),
-    unreadCount: 0,
-    isOnline: true,
-  },
-  {
-    id: '3',
-    name: 'Dr. Emily Brown',
-    role: 'Physics Tutor',
-    lastMessage: 'See you in our next session!',
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    unreadCount: 0,
-    isOnline: false,
-  },
-  {
-    id: '4',
-    name: 'Dr. Ahmed Hassan',
-    role: 'Chemistry Tutor',
-    lastMessage: 'Don\'t forget to review the organic chemistry notes',
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 60 * 24),
-    unreadCount: 1,
-    isOnline: false,
-  },
-  {
-    id: '5',
-    name: 'Prof. Lisa Park',
-    role: 'Biology Tutor',
-    lastMessage: 'The lab report looks excellent!',
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 60 * 48),
-    unreadCount: 0,
-    isOnline: true,
-  },
-];
-
-// Mock messages for each contact
-const mockMessagesByContact: Record<string, Message[]> = {
-  '1': [
-    { id: '1', content: 'Hi Dr. Wilson! I had a question about the integration problem from yesterday.', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 60), status: 'read', type: 'text' },
-    { id: '2', content: 'Of course! Which problem are you referring to?', senderId: '1', timestamp: new Date(Date.now() - 1000 * 60 * 55), status: 'read', type: 'text' },
-    { id: '3', content: 'The one with the trigonometric substitution. I\'m stuck on the last step.', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 50), status: 'read', type: 'text' },
-    { id: '4', content: 'Ah yes! Remember to substitute back to the original variable after integrating. Let me show you...', senderId: '1', timestamp: new Date(Date.now() - 1000 * 60 * 45), status: 'read', type: 'text' },
-    { id: '5', content: 'That makes so much more sense now! Thank you!', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 10), status: 'read', type: 'text' },
-    { id: '6', content: 'Great progress on your calculus work!', senderId: '1', timestamp: new Date(Date.now() - 1000 * 60 * 5), status: 'read', type: 'text' },
-  ],
-  '2': [
-    { id: '1', content: 'Professor Chen, I finished the Python assignment!', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), status: 'read', type: 'text' },
-    { id: '2', content: 'Excellent! Let me take a look at your code.', senderId: '2', timestamp: new Date(Date.now() - 1000 * 60 * 60), status: 'read', type: 'text' },
-    { id: '3', content: 'The code looks much better now', senderId: '2', timestamp: new Date(Date.now() - 1000 * 60 * 30), status: 'read', type: 'text' },
-  ],
-  '3': [
-    { id: '1', content: 'Thank you for the physics session today!', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), status: 'read', type: 'text' },
-    { id: '2', content: 'You\'re welcome! You\'re making great progress with quantum mechanics.', senderId: '3', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2.5), status: 'read', type: 'text' },
-    { id: '3', content: 'See you in our next session!', senderId: '3', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), status: 'read', type: 'text' },
-  ],
-  '4': [
-    { id: '1', content: 'Dr. Hassan, I have a question about organic chemistry reactions.', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 25), status: 'read', type: 'text' },
-    { id: '2', content: 'Don\'t forget to review the organic chemistry notes', senderId: '4', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), status: 'delivered', type: 'text' },
-  ],
-  '5': [
-    { id: '1', content: 'I submitted my lab report!', senderId: 'me', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 49), status: 'read', type: 'text' },
-    { id: '2', content: 'The lab report looks excellent!', senderId: '5', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), status: 'read', type: 'text' },
-  ],
-};
-
 // Helper function to format time
-const formatTime = (date: Date) => {
+const formatTime = (dateStr: string | null | undefined) => {
+  if (!dateStr) return '';
+
+  const date = new Date(dateStr);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -167,7 +93,7 @@ const ContactItem = ({
     {/* Avatar */}
     <div className="relative">
       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-        {contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+        {contact.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
       </div>
       {contact.isOnline && (
         <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
@@ -220,19 +146,38 @@ const MessageBubble = ({ message, isOwn }: { message: Message; isOwn: boolean })
       )}
     >
       <p className="text-sm leading-relaxed">{message.content}</p>
+      {/* Attachments */}
+      {message.attachments && message.attachments.length > 0 && (
+        <div className="mt-2 space-y-1">
+          {message.attachments.map((attachment, idx) => (
+            <a
+              key={idx}
+              href={attachment.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={clsx(
+                'block text-xs underline',
+                isOwn ? 'text-blue-200' : 'text-blue-500'
+              )}
+            >
+              📎 {attachment.name}
+            </a>
+          ))}
+        </div>
+      )}
       <div className={clsx(
         'flex items-center justify-end gap-1 mt-1',
         isOwn ? 'text-white/70' : 'text-gray-400'
       )}>
         <span className="text-[10px]">
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
         {isOwn && (
           <span className="ml-0.5">
             {message.status === 'sending' && <Clock className="w-3 h-3" />}
             {message.status === 'sent' && <Check className="w-3 h-3" />}
             {message.status === 'delivered' && <CheckCheck className="w-3 h-3" />}
-            {message.status === 'read' && <CheckCheck className="w-3 h-3 text-blue-300" />}
+            {(message.status === 'read' || message.read) && <CheckCheck className="w-3 h-3 text-blue-300" />}
           </span>
         )}
       </div>
@@ -242,26 +187,74 @@ const MessageBubble = ({ message, isOwn }: { message: Message; isOwn: boolean })
 
 // Main Messages Page Component
 export default function MessagesPage() {
-  const [contacts, setContacts] = useState<Contact[]>(mockContacts);
+  const { data: session } = useSession();
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [potentialContacts, setPotentialContacts] = useState<Contact[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showMobileChat, setShowMobileChat] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [showNewChat, setShowNewChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load messages when contact is selected
-  useEffect(() => {
-    if (selectedContact) {
-      const contactMessages = mockMessagesByContact[selectedContact.id] || [];
-      setMessages(contactMessages);
+  const currentUserId = session?.user?.id;
 
-      // Clear unread count
-      setContacts(prev => prev.map(c =>
-        c.id === selectedContact.id ? { ...c, unreadCount: 0 } : c
-      ));
+  // Fetch conversations
+  const fetchConversations = useCallback(async () => {
+    try {
+      const response = await fetch('/api/messages/conversations');
+      if (!response.ok) throw new Error('Failed to fetch conversations');
+
+      const data = await response.json();
+
+      setContacts(data.conversations || []);
+      setPotentialContacts(data.potentialContacts || []);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    } finally {
+      setLoading(false);
     }
+  }, []);
+
+  // Load conversations on mount
+  useEffect(() => {
+    if (session?.user) {
+      fetchConversations();
+    }
+  }, [session, fetchConversations]);
+
+  // Fetch messages when contact is selected
+  useEffect(() => {
+    async function fetchMessages() {
+      if (!selectedContact) return;
+
+      setMessagesLoading(true);
+      try {
+        const response = await fetch(`/api/messages?userId=${selectedContact.id}`);
+        if (!response.ok) throw new Error('Failed to fetch messages');
+
+        const data = await response.json();
+        // Reverse to show oldest first
+        setMessages(Array.isArray(data) ? data.reverse() : []);
+
+        // Clear unread count for this contact
+        setContacts(prev => prev.map(c =>
+          c.id === selectedContact.id ? { ...c, unreadCount: 0 } : c
+        ));
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+        setMessages([]);
+      } finally {
+        setMessagesLoading(false);
+      }
+    }
+
+    fetchMessages();
   }, [selectedContact]);
 
   // Scroll to bottom when messages change
@@ -279,81 +272,76 @@ export default function MessagesPage() {
   const handleSelectContact = (contact: Contact) => {
     setSelectedContact(contact);
     setShowMobileChat(true);
+    setShowNewChat(false);
   };
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedContact) return;
+  const handleStartNewChat = (contact: Contact) => {
+    // Move from potential contacts to active contacts
+    setContacts(prev => {
+      if (prev.find(c => c.id === contact.id)) return prev;
+      return [contact, ...prev];
+    });
+    setPotentialContacts(prev => prev.filter(c => c.id !== contact.id));
+    setSelectedContact(contact);
+    setShowMobileChat(true);
+    setShowNewChat(false);
+  };
 
-    const message: Message = {
-      id: Date.now().toString(),
-      content: newMessage.trim(),
-      senderId: 'me',
-      timestamp: new Date(),
-      status: 'sending',
-      type: 'text',
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedContact || !currentUserId || sending) return;
+
+    const messageContent = newMessage.trim();
+    setNewMessage('');
+    setSending(true);
+
+    // Optimistically add the message
+    const optimisticMessage: Message = {
+      id: `temp-${Date.now()}`,
+      content: messageContent,
+      senderId: currentUserId,
+      receiverId: selectedContact.id,
+      createdAt: new Date().toISOString(),
+      read: false,
+      status: 'sending'
     };
 
-    setMessages(prev => [...prev, message]);
-    setNewMessage('');
+    setMessages(prev => [...prev, optimisticMessage]);
 
-    // Simulate message being sent
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append('content', messageContent);
+      formData.append('receiverId', selectedContact.id);
+
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('Failed to send message');
+
+      const sentMessage = await response.json();
+
+      // Replace optimistic message with real one
       setMessages(prev => prev.map(m =>
-        m.id === message.id ? { ...m, status: 'sent' } : m
+        m.id === optimisticMessage.id ? { ...sentMessage, status: 'sent' } : m
       ));
 
-      // Simulate delivered
-      setTimeout(() => {
-        setMessages(prev => prev.map(m =>
-          m.id === message.id ? { ...m, status: 'delivered' } : m
-        ));
+      // Update last message in contacts
+      setContacts(prev => prev.map(c =>
+        c.id === selectedContact.id
+          ? { ...c, lastMessage: messageContent, lastMessageTime: new Date().toISOString() }
+          : c
+      ));
 
-        // Simulate typing indicator
-        setContacts(prev => prev.map(c =>
-          c.id === selectedContact.id ? { ...c, isTyping: true } : c
-        ));
-
-        // Simulate response
-        setTimeout(() => {
-          setContacts(prev => prev.map(c =>
-            c.id === selectedContact.id ? { ...c, isTyping: false } : c
-          ));
-
-          // AI-like response
-          const responses = [
-            "That's a great question! Let me help you with that.",
-            "I understand. Let's work through this together.",
-            "Excellent progress! Keep up the good work.",
-            "Sure, I'd be happy to explain that further.",
-            "Let me know if you need any clarification.",
-          ];
-          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-
-          const aiMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            content: randomResponse,
-            senderId: selectedContact.id,
-            timestamp: new Date(),
-            status: 'read',
-            type: 'text',
-          };
-
-          setMessages(prev => [...prev, aiMessage]);
-
-          // Mark original message as read
-          setMessages(prev => prev.map(m =>
-            m.id === message.id ? { ...m, status: 'read' } : m
-          ));
-        }, 2000);
-      }, 500);
-    }, 300);
-
-    // Update last message in contacts
-    setContacts(prev => prev.map(c =>
-      c.id === selectedContact.id
-        ? { ...c, lastMessage: newMessage.trim(), lastMessageTime: new Date() }
-        : c
-    ));
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Mark message as failed
+      setMessages(prev => prev.map(m =>
+        m.id === optimisticMessage.id ? { ...m, status: 'failed' } : m
+      ));
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -366,6 +354,23 @@ export default function MessagesPage() {
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const filteredPotentialContacts = potentialContacts.filter(contact =>
+    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalUnread = contacts.reduce((acc, c) => acc + c.unreadCount, 0);
+
+  if (loading) {
+    return (
+      <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">Loading messages...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -387,7 +392,11 @@ export default function MessagesPage() {
                 Messages
               </h1>
               <div className="flex items-center gap-2">
-                <Button variant="secondary" className="w-9 h-9 p-0">
+                <Button
+                  variant="secondary"
+                  className="w-9 h-9 p-0"
+                  onClick={() => setShowNewChat(!showNewChat)}
+                >
                   <Plus className="w-4 h-4" />
                 </Button>
                 <Button variant="secondary" className="w-9 h-9 p-0">
@@ -407,12 +416,44 @@ export default function MessagesPage() {
             </div>
           </div>
 
+          {/* New Chat Section */}
+          {showNewChat && potentialContacts.length > 0 && (
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20">
+                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                  <UserPlus className="w-3 h-3" />
+                  Start a new conversation
+                </p>
+              </div>
+              <div className="max-h-48 overflow-y-auto">
+                {filteredPotentialContacts.map((contact) => (
+                  <ContactItem
+                    key={contact.id}
+                    contact={contact}
+                    isSelected={false}
+                    onClick={() => handleStartNewChat(contact)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Contacts List */}
           <div className="flex-1 overflow-y-auto">
-            {filteredContacts.length === 0 ? (
+            {filteredContacts.length === 0 && filteredPotentialContacts.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4">
                 <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
-                <p className="text-sm">No conversations found</p>
+                <p className="text-sm">No conversations yet</p>
+                <p className="text-xs text-center mt-2">
+                  {session?.user?.role === 'student'
+                    ? 'Enroll in a course or book a session to message teachers'
+                    : 'Your students will appear here'}
+                </p>
+              </div>
+            ) : filteredContacts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4">
+                <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
+                <p className="text-sm">No matching conversations</p>
               </div>
             ) : (
               <div>
@@ -447,7 +488,7 @@ export default function MessagesPage() {
                   </button>
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-pink-500 flex items-center justify-center text-white font-semibold text-sm">
-                      {selectedContact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      {selectedContact.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                     </div>
                     {selectedContact.isOnline && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
@@ -458,11 +499,7 @@ export default function MessagesPage() {
                       {selectedContact.name}
                     </h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {contacts.find(c => c.id === selectedContact.id)?.isTyping
-                        ? <span className="text-green-500">typing...</span>
-                        : selectedContact.isOnline
-                          ? 'Online'
-                          : 'Offline'}
+                      {selectedContact.role}
                     </p>
                   </div>
                 </div>
@@ -481,13 +518,25 @@ export default function MessagesPage() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50 dark:bg-gray-900/50">
-                {messages.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    isOwn={message.senderId === 'me'}
-                  />
-                ))}
+                {messagesLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                    <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
+                    <p className="text-sm">No messages yet</p>
+                    <p className="text-xs mt-1">Send a message to start the conversation</p>
+                  </div>
+                ) : (
+                  messages.map((message) => (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      isOwn={message.senderId === currentUserId}
+                    />
+                  ))
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
@@ -508,18 +557,21 @@ export default function MessagesPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Type a message..."
-                      className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-900 border-0 text-gray-900 dark:text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={sending}
+                      className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-900 border-0 text-gray-900 dark:text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </div>
-                  {newMessage.trim() ? (
-                    <Button onClick={handleSendMessage} className="w-10 h-10 p-0 shrink-0">
+                  <Button
+                    onClick={handleSendMessage}
+                    className="w-10 h-10 p-0 shrink-0"
+                    disabled={!newMessage.trim() || sending}
+                  >
+                    {sending ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
                       <Send className="w-5 h-5" />
-                    </Button>
-                  ) : (
-                    <Button variant="secondary" className="w-10 h-10 p-0 shrink-0">
-                      <Mic className="w-5 h-5" />
-                    </Button>
-                  )}
+                    )}
+                  </Button>
                 </div>
               </div>
             </>
@@ -532,19 +584,23 @@ export default function MessagesPage() {
                 Welcome to Messages
               </h2>
               <p className="text-gray-500 dark:text-gray-400 max-w-md mb-6">
-                Connect with your tutors and students. Select a conversation from the list to start messaging.
+                Connect with your {session?.user?.role === 'student' ? 'tutors' : 'students'}. Select a conversation from the list to start messaging.
               </p>
               <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-2">
-                  <Circle className="w-3 h-3 fill-green-500 text-green-500" />
-                  <span>{contacts.filter(c => c.isOnline).length} online</span>
-                </div>
-                <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium">
-                    {contacts.reduce((acc, c) => acc + c.unreadCount, 0)}
+                    {contacts.length}
                   </span>
-                  <span>unread messages</span>
+                  <span>conversations</span>
                 </div>
+                {totalUnread > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full text-xs font-medium">
+                      {totalUnread}
+                    </span>
+                    <span>unread</span>
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -4,20 +4,38 @@ import { courseSchema } from '@/models/Course';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-async function validateCourseAccess(courseId: string, userId: string) {
+async function validateCourseAccess(courseId: string, userId: string, requireTeacher = false) {
   if (!courseId) {
     return null;
   }
 
   try {
-    const course = await prisma.course.findUnique({
-      where: {
-        id: courseId,
-        teacherId: userId
-      }
-    });
-
-    return course;
+    if (requireTeacher) {
+      // Only allow course teacher
+      return await prisma.course.findUnique({
+        where: {
+          id: courseId,
+          teacherId: userId
+        }
+      });
+    } else {
+      // Allow teacher OR enrolled student
+      return await prisma.course.findFirst({
+        where: {
+          id: courseId,
+          OR: [
+            { teacherId: userId },
+            {
+              enrollments: {
+                some: {
+                  studentId: userId
+                }
+              }
+            }
+          ]
+        }
+      });
+    }
   } catch (error) {
     console.error("Error validating course access:", error);
     return null;
@@ -65,7 +83,7 @@ export async function PATCH(
 
     const params = await context.params;
     const { courseId } = params;
-    const course = await validateCourseAccess(courseId, session.user.id);
+    const course = await validateCourseAccess(courseId, session.user.id, true);
 
     if (!course) {
       return NextResponse.json({ error: 'Course not found or access denied' }, { status: 404 });
@@ -103,7 +121,7 @@ export async function DELETE(
 
     const params = await context.params;
     const { courseId } = params;
-    const course = await validateCourseAccess(courseId, session.user.id);
+    const course = await validateCourseAccess(courseId, session.user.id, true);
 
     if (!course) {
       return NextResponse.json({ error: 'Course not found or access denied' }, { status: 404 });
@@ -117,7 +135,7 @@ export async function DELETE(
           courseId: courseId
         }
       }),
-      
+
       // Delete the course itself
       prisma.course.delete({
         where: {

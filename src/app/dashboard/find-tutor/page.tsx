@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
@@ -29,7 +29,7 @@ import clsx from 'clsx';
 
 // Types
 interface Tutor {
-    id: number;
+    id: string;
     name: string;
     title: string;
     university: string;
@@ -55,105 +55,7 @@ interface AIMatchRequest {
     urgency: string;
 }
 
-// Mock tutors data
-const allTutors: Tutor[] = [
-    {
-        id: 1,
-        name: 'Dr. Sarah Wilson',
-        title: 'PhD in Mathematics',
-        university: 'MIT',
-        expertise: ['Calculus', 'Linear Algebra', 'Statistics', 'Differential Equations'],
-        rating: 4.9,
-        reviews: 234,
-        students: 1250,
-        hourlyRate: 75,
-        availability: 'Available Now',
-        matchScore: 0,
-        bio: 'Former MIT professor with 10+ years of teaching experience. Specialized in making complex mathematical concepts easy to understand.',
-        languages: ['English', 'French'],
-        responseTime: '< 1 hour',
-    },
-    {
-        id: 2,
-        name: 'Prof. Michael Chen',
-        title: 'PhD in Computer Science',
-        university: 'Stanford University',
-        expertise: ['Machine Learning', 'Python', 'Data Science', 'Deep Learning', 'AI'],
-        rating: 4.8,
-        reviews: 189,
-        students: 980,
-        hourlyRate: 85,
-        availability: 'Available in 2 hours',
-        matchScore: 0,
-        bio: 'AI researcher at Stanford with publications in top journals. Passionate about helping students master ML concepts.',
-        languages: ['English', 'Mandarin'],
-        responseTime: '< 2 hours',
-    },
-    {
-        id: 3,
-        name: 'Dr. Emily Brown',
-        title: 'PhD in Physics',
-        university: 'Cambridge University',
-        expertise: ['Quantum Physics', 'Thermodynamics', 'Mechanics', 'Electromagnetism'],
-        rating: 4.7,
-        reviews: 156,
-        students: 720,
-        hourlyRate: 70,
-        availability: 'Available Tomorrow',
-        matchScore: 0,
-        bio: 'Cambridge fellow with expertise in theoretical physics. Known for creative teaching methods and patient explanations.',
-        languages: ['English', 'German'],
-        responseTime: '< 3 hours',
-    },
-    {
-        id: 4,
-        name: 'Dr. Ahmed Hassan',
-        title: 'PhD in Chemistry',
-        university: 'Oxford University',
-        expertise: ['Organic Chemistry', 'Biochemistry', 'Lab Techniques', 'Pharmacology'],
-        rating: 4.9,
-        reviews: 201,
-        students: 890,
-        hourlyRate: 65,
-        availability: 'Available Now',
-        matchScore: 0,
-        bio: 'Oxford researcher with industry experience in pharmaceutical development. Excellent at exam preparation.',
-        languages: ['English', 'Arabic'],
-        responseTime: '< 1 hour',
-    },
-    {
-        id: 5,
-        name: 'Dr. Lisa Park',
-        title: 'PhD in Biology',
-        university: 'Harvard University',
-        expertise: ['Molecular Biology', 'Genetics', 'Cell Biology', 'Neuroscience'],
-        rating: 4.8,
-        reviews: 178,
-        students: 650,
-        hourlyRate: 80,
-        availability: 'Available Now',
-        matchScore: 0,
-        bio: 'Harvard researcher specializing in genetics and molecular biology. Patient teacher who adapts to each student\'s pace.',
-        languages: ['English', 'Korean'],
-        responseTime: '< 2 hours',
-    },
-    {
-        id: 6,
-        name: 'Prof. James Miller',
-        title: 'PhD in Economics',
-        university: 'Yale University',
-        expertise: ['Microeconomics', 'Macroeconomics', 'Econometrics', 'Game Theory'],
-        rating: 4.6,
-        reviews: 145,
-        students: 520,
-        hourlyRate: 70,
-        availability: 'Available in 4 hours',
-        matchScore: 0,
-        bio: 'Former Wall Street analyst turned academic. Brings real-world examples to economic theory.',
-        languages: ['English', 'Spanish'],
-        responseTime: '< 4 hours',
-    },
-];
+// Mock tutors data moved to /api/tutors/route.ts
 
 const subjects = [
     'All Subjects',
@@ -677,8 +579,12 @@ export default function FindTutorPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('All Subjects');
     const [showFilters, setShowFilters] = useState(false);
-    const [favorites, setFavorites] = useState<number[]>([]);
-    const [tutors, setTutors] = useState<Tutor[]>(allTutors);
+    const [favorites, setFavorites] = useState<string[]>([]);
+
+    // Data states
+    const [tutors, setTutors] = useState<Tutor[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     // AI Matching states
     const [showAIModal, setShowAIModal] = useState(false);
@@ -687,7 +593,40 @@ export default function FindTutorPage() {
     const [matchedTutors, setMatchedTutors] = useState<Tutor[]>([]);
     const [matchRequest, setMatchRequest] = useState<AIMatchRequest | null>(null);
 
-    const toggleFavorite = (id: number) => {
+    // Fetch tutors logic
+    const fetchTutors = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            const params = new URLSearchParams();
+            if (searchQuery) params.append('search', searchQuery);
+            if (selectedSubject !== 'All Subjects') params.append('subject', selectedSubject);
+
+            const response = await fetch(`/api/tutors?${params.toString()}`);
+            const data = await response.json();
+
+            if (data.success) {
+                setTutors(data.data);
+                setError(null);
+            } else {
+                setError('Failed to load tutors');
+            }
+        } catch (err) {
+            setError('An error occurred while fetching tutors');
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [searchQuery, selectedSubject]);
+
+    // Initial load and updates when filters change
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            fetchTutors();
+        }, 300);
+        return () => clearTimeout(timeoutId);
+    }, [fetchTutors]);
+
+    const toggleFavorite = (id: string) => {
         setFavorites(prev =>
             prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
         );
@@ -716,7 +655,7 @@ export default function FindTutorPage() {
 Analyze these tutors and rank them by match score (0-100). For each tutor provide a brief reason why they match.
 
 Tutors:
-${allTutors.map(t => `ID:${t.id}, Name:${t.name}, Title:${t.title}, University:${t.university}, Expertise:[${t.expertise.join(',')}], Rate:$${t.hourlyRate}/hr, Availability:${t.availability}, Rating:${t.rating}`).join('\n')}
+${tutors.slice(0, 10).map(t => `ID:${t.id}, Name:${t.name}, Title:${t.title}, University:${t.university}, Expertise:[${t.expertise.join(',')}], Rate:$${t.hourlyRate}/hr, Availability:${t.availability}, Rating:${t.rating}`).join('\n')}
 
 Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number, "reason": "brief explanation"}]. Order by matchScore descending. No other text.`,
                     systemPrompt: 'You are a tutor matching AI. Return ONLY valid JSON array, no markdown, no explanation.',
@@ -730,8 +669,8 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                     const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : data.response);
 
                     // Map AI results to tutors
-                    const rankedTutors: Tutor[] = parsed.map((match: { id: number; matchScore: number; reason: string }) => {
-                        const tutor = allTutors.find(t => t.id === match.id);
+                    const rankedTutors: Tutor[] = parsed.map((match: { id: string; matchScore: number; reason: string }) => {
+                        const tutor = tutors.find(t => t.id === match.id);
                         if (tutor) {
                             return {
                                 ...tutor,
@@ -746,43 +685,27 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                 } catch (e) {
                     console.error('Parse error:', e);
                     // Fallback: simple matching
-                    const fallbackTutors = allTutors
-                        .filter(t => t.expertise.some(e =>
-                            e.toLowerCase().includes(request.subject.toLowerCase()) ||
-                            request.topic.toLowerCase().includes(e.toLowerCase())
-                        ))
+                    const fallbackTutors = tutors
+                        .slice(0, 4)
                         .map(t => ({ ...t, matchScore: Math.floor(Math.random() * 20) + 75 }))
-                        .sort((a, b) => b.matchScore - a.matchScore)
-                        .slice(0, 4);
+                        .sort((a, b) => b.matchScore - a.matchScore);
                     setMatchedTutors(fallbackTutors);
                 }
             }
         } catch (error) {
             console.error('AI Match error:', error);
-            // Fallback matching
-            const fallbackTutors = allTutors
+            const fallbackTutors = tutors
+                .slice(0, 4)
                 .map(t => ({ ...t, matchScore: Math.floor(Math.random() * 30) + 70 }))
-                .sort((a, b) => b.matchScore - a.matchScore)
-                .slice(0, 4);
+                .sort((a, b) => b.matchScore - a.matchScore);
             setMatchedTutors(fallbackTutors);
         } finally {
             setIsMatching(false);
         }
-    }, []);
+    }, [tutors]);
 
-    // Filter tutors based on search and subject
-    const filteredTutors = tutors.filter(tutor => {
-        const matchesSearch = searchQuery === '' ||
-            tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            tutor.expertise.some(e => e.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            tutor.university.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const matchesSubject = selectedSubject === 'All Subjects' ||
-            tutor.expertise.some(e => e.toLowerCase().includes(selectedSubject.toLowerCase())) ||
-            tutor.title.toLowerCase().includes(selectedSubject.toLowerCase());
-
-        return matchesSearch && matchesSubject;
-    });
+    // Derived state for the view is now just 'tutors' since filtering happens on backend
+    const filteredTutors = tutors;
 
     return (
         <>

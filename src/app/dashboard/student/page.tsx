@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import {
     BookOpen,
     Brain,
@@ -11,9 +13,12 @@ import {
     Clock,
     CheckCircle,
     Play,
-    GraduationCap
+    GraduationCap,
+    Loader2,
+    ExternalLink
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { AIChat } from '@/components/ai/AIChat';
 import {
     AreaChart,
@@ -23,21 +28,41 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    BarChart,
-    Bar,
     PieChart,
     Pie,
     Cell
 } from 'recharts';
+import { toast } from 'sonner';
+import Image from 'next/image';
 import clsx from 'clsx';
 
-// Mock data for modules
-const modules = [
-    { id: 1, name: 'Advanced Mathematics', progress: 75, lessons: 24, completed: 18, color: '#3B82F6' },
-    { id: 2, name: 'Quantum Physics', progress: 45, lessons: 20, completed: 9, color: '#EC4899' },
-    { id: 3, name: 'Machine Learning', progress: 90, lessons: 30, completed: 27, color: '#10B981' },
-    { id: 4, name: 'Data Structures', progress: 60, lessons: 16, completed: 10, color: '#F59E0B' },
-];
+// Types for enrolled courses
+interface EnrolledCourse {
+    id: string;
+    title: string;
+    description: string;
+    imageUrl?: string;
+    category: string;
+    price: number;
+    status: string;
+    enrolledAt: string;
+    enrollmentId: string;
+    teacher: {
+        id?: string;
+        name: string;
+        image?: string | null;
+    };
+    _count: {
+        enrollments: number;
+        lessons: number;
+    };
+    totalLessons: number;
+    completedLessons: number;
+    progress: number;
+}
+
+// Color palette for courses
+const courseColors = ['#3B82F6', '#EC4899', '#10B981', '#F59E0B', '#8B5CF6', '#06B6D4'];
 
 // Mock data for performance chart
 const performanceData = [
@@ -49,7 +74,7 @@ const performanceData = [
     { name: 'Week 6', score: 92, hours: 20 },
 ];
 
-// Mock data for subject distribution
+// Mock data for subject distribution (will be replaced with real data)
 const subjectData = [
     { name: 'Mathematics', value: 35, color: '#3B82F6' },
     { name: 'Physics', value: 25, color: '#EC4899' },
@@ -102,7 +127,59 @@ const item = {
 };
 
 export default function StudentDashboard() {
-    const [showChat, setShowChat] = useState(false);
+    const { data: session } = useSession();
+    const router = useRouter();
+    const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    // Fetch enrolled courses
+    useEffect(() => {
+        const fetchEnrolledCourses = async () => {
+            try {
+                setIsLoading(true);
+                setError('');
+
+                const response = await fetch('/api/enrollments');
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => null);
+                    throw new Error(errorData?.message || 'Failed to fetch enrolled courses');
+                }
+
+                const data = await response.json();
+                setEnrolledCourses(data);
+            } catch (err) {
+                console.error('Error fetching enrolled courses:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load courses');
+                toast.error('Failed to load your courses');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (session?.user) {
+            fetchEnrolledCourses();
+        }
+    }, [session]);
+
+    // Calculate stats from enrolled courses
+    const stats = {
+        coursesEnrolled: enrolledCourses.length,
+        totalLessons: enrolledCourses.reduce((acc, course) => acc + course._count.lessons, 0),
+        completedLessons: enrolledCourses.reduce((acc, course) => acc + course.completedLessons, 0),
+        avgProgress: enrolledCourses.length > 0
+            ? Math.round(enrolledCourses.reduce((acc, course) => acc + course.progress, 0) / enrolledCourses.length)
+            : 0
+    };
+
+    const handleWatchCourse = (courseId: string) => {
+        router.push(`/dashboard/courses/${courseId}/content`);
+    };
+
+    const handleExploreCourses = () => {
+        router.push('/dashboard/courses');
+    };
 
     return (
         <motion.div
@@ -117,10 +194,10 @@ export default function StudentDashboard() {
                 transition={{ duration: 0.5 }}
             >
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
-                    Student Dashboard
+                    My Courses
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">
-                    An AI Ecosystem Connecting Students with PhD Researchers — Where Intelligence Finds Its Match.
+                    View and continue your enrolled courses
                 </p>
             </motion.div>
 
@@ -132,10 +209,10 @@ export default function StudentDashboard() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
             >
                 {[
-                    { label: 'Courses Enrolled', value: '8', icon: BookOpen, change: '+2 this month' },
-                    { label: 'Study Hours', value: '142', icon: Clock, change: '+23 this week' },
-                    { label: 'Avg. Score', value: '87%', icon: TrendingUp, change: '+5% improvement' },
-                    { label: 'Completed', value: '24', icon: CheckCircle, change: '6 pending' },
+                    { label: 'Courses Enrolled', value: stats.coursesEnrolled.toString(), icon: BookOpen, change: 'Active courses' },
+                    { label: 'Total Lessons', value: stats.totalLessons.toString(), icon: GraduationCap, change: 'Available to watch' },
+                    { label: 'Completed', value: stats.completedLessons.toString(), icon: CheckCircle, change: `${stats.totalLessons - stats.completedLessons} remaining` },
+                    { label: 'Avg. Progress', value: `${stats.avgProgress}%`, icon: TrendingUp, change: 'Overall completion' },
                 ].map((stat, index) => (
                     <motion.div key={index} variants={item}>
                         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-shadow">
@@ -157,7 +234,7 @@ export default function StudentDashboard() {
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* My Modules Section */}
+                {/* My Enrolled Courses Section */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -165,60 +242,163 @@ export default function StudentDashboard() {
                     className="lg:col-span-2"
                 >
                     <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-pink-100 dark:from-blue-900/30 dark:to-pink-900/30 flex items-center justify-center">
-                                <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Modules</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Track your course progress</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            {modules.map((module) => (
-                                <div
-                                    key={module.id}
-                                    className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors cursor-pointer"
-                                >
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                                style={{ backgroundColor: `${module.color}20` }}
-                                            >
-                                                <GraduationCap className="w-5 h-5" style={{ color: module.color }} />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-medium text-gray-900 dark:text-white">{module.name}</h3>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {module.completed}/{module.lessons} lessons completed
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <button className="p-2 rounded-lg bg-gradient-to-r from-blue-600 to-pink-600 text-white hover:shadow-lg transition-shadow">
-                                            <Play className="w-4 h-4" />
-                                        </button>
-                                    </div>
-
-                                    {/* Progress Bar */}
-                                    <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${module.progress}%` }}
-                                            transition={{ duration: 1, delay: 0.5 }}
-                                            className="absolute h-full rounded-full"
-                                            style={{
-                                                background: `linear-gradient(to right, ${module.color}, ${module.color}88)`
-                                            }}
-                                        />
-                                    </div>
-                                    <p className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                        {module.progress}% complete
-                                    </p>
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-pink-100 dark:from-blue-900/30 dark:to-pink-900/30 flex items-center justify-center">
+                                    <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
-                            ))}
+                                <div>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Enrolled Courses</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Continue learning where you left off</p>
+                                </div>
+                            </div>
+                            <Button
+                                variant="secondary"
+                                onClick={handleExploreCourses}
+                                className="text-sm"
+                            >
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                Explore More
+                            </Button>
                         </div>
+
+                        {/* Loading State */}
+                        {isLoading && (
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
+                                <p className="text-gray-500 dark:text-gray-400">Loading your courses...</p>
+                            </div>
+                        )}
+
+                        {/* Error State */}
+                        {error && !isLoading && (
+                            <div className="text-center py-12">
+                                <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
+                                <Button onClick={() => window.location.reload()}>Try Again</Button>
+                            </div>
+                        )}
+
+                        {/* Empty State */}
+                        {!isLoading && !error && enrolledCourses.length === 0 && (
+                            <div className="text-center py-12">
+                                <motion.div
+                                    animate={{
+                                        scale: [1, 1.1, 1],
+                                        rotate: [0, 5, -5, 0]
+                                    }}
+                                    transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        repeatType: "reverse"
+                                    }}
+                                >
+                                    <BookOpen className="w-16 h-16 mb-4 text-pink-600 dark:text-pink-400 mx-auto" />
+                                </motion.div>
+                                <h3 className="text-xl font-semibold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                                    No courses enrolled yet
+                                </h3>
+                                <p className="text-gray-500 dark:text-gray-400 mb-6">
+                                    Start your learning journey by enrolling in a course
+                                </p>
+                                <Button onClick={handleExploreCourses}>
+                                    <BookOpen className="w-4 h-4 mr-2" />
+                                    Browse Courses
+                                </Button>
+                            </div>
+                        )}
+
+                        {/* Courses List */}
+                        {!isLoading && !error && enrolledCourses.length > 0 && (
+                            <div className="space-y-4">
+                                <AnimatePresence>
+                                    {enrolledCourses.map((course, index) => (
+                                        <motion.div
+                                            key={course.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ delay: index * 0.1 }}
+                                            className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-all cursor-pointer group"
+                                            onClick={() => handleWatchCourse(course.id)}
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                {/* Course Image/Icon */}
+                                                <div className="relative w-24 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                                    {course.imageUrl ? (
+                                                        <Image
+                                                            src={course.imageUrl}
+                                                            alt={course.title}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            className="w-full h-full flex items-center justify-center"
+                                                            style={{ backgroundColor: `${courseColors[index % courseColors.length]}20` }}
+                                                        >
+                                                            <GraduationCap
+                                                                className="w-8 h-8"
+                                                                style={{ color: courseColors[index % courseColors.length] }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Course Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                                                            {course.title}
+                                                        </h3>
+                                                        <Button
+                                                            size="sm"
+                                                            className="ml-2 flex-shrink-0 bg-gradient-to-r from-blue-600 to-pink-600 hover:from-blue-700 hover:to-pink-700 text-white"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleWatchCourse(course.id);
+                                                            }}
+                                                        >
+                                                            <Play className="w-4 h-4 mr-1" />
+                                                            Watch
+                                                        </Button>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                                        <span className="flex items-center gap-1">
+                                                            <Users className="w-3 h-3" />
+                                                            {course.teacher.name}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <BookOpen className="w-3 h-3" />
+                                                            {course._count.lessons} lessons
+                                                        </span>
+                                                        <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs">
+                                                            {course.category}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Progress Bar */}
+                                                    <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                        <motion.div
+                                                            initial={{ width: 0 }}
+                                                            animate={{ width: `${course.progress}%` }}
+                                                            transition={{ duration: 1, delay: 0.5 }}
+                                                            className="absolute h-full rounded-full bg-gradient-to-r"
+                                                            style={{
+                                                                background: `linear-gradient(to right, ${courseColors[index % courseColors.length]}, ${courseColors[index % courseColors.length]}88)`
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <p className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        {course.completedLessons}/{course._count.lessons} lessons • {course.progress}% complete
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </div>
+                        )}
                     </Card>
                 </motion.div>
 

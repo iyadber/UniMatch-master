@@ -46,18 +46,18 @@ interface MenuItem {
   badge?: number | string;
   section?: string;
   comingSoon?: boolean;
+  hiddenForRoles?: string[];
 }
 
 // Main navigation items
 const mainMenuItems: MenuItem[] = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { name: 'AI Learning Hub', icon: Brain, path: '/dashboard/learning-hub' },
-  { name: 'Find a PhD Tutor', icon: GraduationCap, path: '/dashboard/find-tutor' },
+  { name: 'AI Learning Hub', icon: Brain, path: '/dashboard/learning-hub', hiddenForRoles: ['teacher'] },
+  { name: 'Find a PhD Tutor', icon: GraduationCap, path: '/dashboard/find-tutor', hiddenForRoles: ['teacher'] },
   { name: 'AI Chat Tutor', icon: Sparkles, path: '/dashboard/ai-chat' },
   { name: 'Calendar', icon: Calendar, path: '/dashboard/schedule', badge: 2 },
   { name: 'Messages', icon: MessageSquare, path: '/dashboard/messages', badge: 5 },
-  { name: 'Courses', icon: BookOpen, path: '/dashboard/courses' },
-  { name: 'Career Boost', icon: Rocket, path: '/dashboard/career-boost', comingSoon: true },
+  { name: 'Courses', icon: BookOpen, path: '/dashboard/courses', hiddenForRoles: ['teacher'] },
 ];
 
 // Student-specific menu items
@@ -70,8 +70,6 @@ const studentMenuItems: MenuItem[] = [
 // Tutor-specific menu items
 const tutorMenuItems: MenuItem[] = [
   { name: 'My Bookings', icon: Calendar, path: '/dashboard/tutor', section: 'Tutor Dashboard' },
-  { name: 'Earnings', icon: DollarSign, path: '/dashboard/tutor#earnings' },
-  { name: 'Student Analytics', icon: BarChart3, path: '/dashboard/tutor#analytics' },
   { name: 'My Rating', icon: Star, path: '/dashboard/tutor#rating' },
 ];
 
@@ -258,12 +256,14 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
           )} ref={navRef}>
             <div className="space-y-1">
               {/* Main Menu Items */}
-              {mainMenuItems.map((item, index) => {
-                const isActive = pathname === item.path;
-                return (
-                  <MenuItem key={index} item={item} isActive={isActive} />
-                );
-              })}
+              {mainMenuItems
+                .filter(item => !item.hiddenForRoles?.includes(userRole))
+                .map((item, index) => {
+                  const isActive = pathname === item.path;
+                  return (
+                    <MenuItem key={index} item={item} isActive={isActive} />
+                  );
+                })}
 
               {/* Divider */}
               {!isCollapsed && (

@@ -515,7 +515,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: `Generate ${isInitial ? 5 : 3} flashcards for a ${preferences.experienceLevel} student studying ${subjects}. Focus on ${preferences.learningGoals.join(', ')}. Return ONLY a valid JSON array with format: [{"question": "...", "answer": "...", "topic": "..."}]. No other text.`,
-                    systemPrompt: 'You are an educational AI. Return ONLY valid JSON array, no markdown, no explanation.',
+                    systemPrompt: 'You are an educational AI. OUTPUT ONLY RAW JSON. NO MARKDOWN. NO BACKTICKS.',
                 }),
             });
             const data = await response.json();
@@ -680,7 +680,7 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: `Create 5 multiple choice quiz questions for a ${preferences.experienceLevel} student studying ${subjects}. Goals: ${preferences.learningGoals.join(', ')}. Return ONLY valid JSON array: [{"question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..."}]. correctAnswer is 0-indexed. No other text.`,
-                    systemPrompt: 'You are an educational AI. Return ONLY valid JSON array, no markdown.',
+                    systemPrompt: 'You are an educational AI. OUTPUT ONLY RAW JSON. NO MARKDOWN. NO BACKTICKS.',
                 }),
             });
             const data = await response.json();
@@ -965,69 +965,162 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
     );
 };
 
-// Learning Paths Component
+// AI-Powered Course Recommendations - Recommends 3 real courses from database
 const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferences }) => {
-    const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
-    const [selectedPath, setSelectedPath] = useState<LearningPath | null>(null);
-    const [isGenerating, setIsGenerating] = useState(true);
+    const [availableCourses, setAvailableCourses] = useState<any[]>([]);
+    const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
+    const [selectedCourse, setSelectedCourse] = useState<any | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [aiReason, setAiReason] = useState<Record<string, string>>({});
 
-    const generatePaths = useCallback(async () => {
-        setIsGenerating(true);
-        try {
-            const subjects = preferences.subjects.map(s =>
-                subjectOptions.find(opt => opt.id === s)?.label || s
-            ).join(', ');
-
-            const response = await fetch('/api/ai/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: `Create 3 personalized learning paths for a ${preferences.experienceLevel} student interested in ${subjects}. Goals: ${preferences.learningGoals.join(', ')}. Weekly time: ${preferences.weeklyHours}. Return ONLY valid JSON array: [{"title": "...", "description": "...", "duration": "X hours", "level": "${preferences.experienceLevel}", "lessons": [{"title": "...", "duration": "XX min", "content": "Brief description..."}]}]. Include 4-5 lessons per path. No other text.`,
-                    systemPrompt: 'You are an educational AI. Return ONLY valid JSON array, no markdown.',
-                }),
-            });
-            const data = await response.json();
-            if (data.success) {
-                try {
-                    const jsonMatch = data.response.match(/\[[\s\S]*\]/);
-                    const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : data.response);
-                    const colors = ['#3B82F6', '#EC4899', '#10B981'];
-                    const icons = [Brain, TrendingUp, FileText];
-                    setLearningPaths(parsed.map((p: LearningPath, i: number) => ({
-                        ...p,
-                        id: i + 1,
-                        color: colors[i % colors.length],
-                        icon: icons[i % icons.length],
-                        progress: 0,
-                        lessons: p.lessons.map((l: Lesson, j: number) => ({
-                            ...l,
-                            id: j + 1,
-                            completed: false,
-                        })),
-                    })));
-                } catch {
-                    console.log('Could not parse learning paths');
-                }
-            }
-        } catch (error) {
-            console.error('Error generating paths:', error);
-        } finally {
-            setIsGenerating(false);
-        }
-    }, [preferences]);
-
+    // Fetch all available courses first
     useEffect(() => {
-        if (preferences.hasCompletedOnboarding) {
-            generatePaths();
-        }
-    }, [preferences.hasCompletedOnboarding, generatePaths]);
+        const fetchCourses = async () => {
+            try {
+                const response = await fetch('/api/courses/available');
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Fetched available courses:', data.length, 'courses');
+                    setAvailableCourses(data);
+                } else {
+                    setError('Failed to load courses');
+                }
+            } catch (err) {
+                console.error('Failed to fetch courses:', err);
+                setError('Failed to connect to server');
+            }
+        };
+        fetchCourses();
+    }, []);
 
-    if (isGenerating) {
+    // Use AI to recommend courses when we have courses and preferences
+    useEffect(() => {
+        const generateRecommendations = async () => {
+            if (availableCourses.length === 0 || !preferences.hasCompletedOnboarding) {
+                setIsLoading(false);
+                return;
+            }
+
+            setIsGenerating(true);
+            setError(null);
+
+            try {
+                const subjects = preferences.subjects.map(s =>
+                    subjectOptions.find(opt => opt.id === s)?.label || s
+                ).join(', ');
+
+                const courseList = availableCourses.map((c, i) =>
+                    `${i + 1}. "${c.title}" (Category: ${c.category}, Price: $${c.price}, Students: ${c._count?.enrollments || 0})`
+                ).join('\n');
+
+                const response = await fetch('/api/ai/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `You are a course recommendation AI. A student named ${preferences.name} has the following profile:
+- Interests: ${subjects}
+- Goals: ${preferences.learningGoals.join(', ')}
+- Experience Level: ${preferences.experienceLevel}
+- Weekly Study Time: ${preferences.weeklyHours}
+
+Here are ALL available courses in our database:
+${courseList}
+
+TASK: Select exactly 3 courses from THIS LIST that best match this student's profile.
+
+Return ONLY a JSON array with this format:
+[
+  {"courseIndex": 1, "reason": "Brief explanation why this course fits the student"},
+  {"courseIndex": 2, "reason": "Brief explanation"},
+  {"courseIndex": 3, "reason": "Brief explanation"}
+]
+
+RULES:
+- courseIndex must be the number from the list above (1-${availableCourses.length})
+- Pick courses that match their interests and experience level
+- Return ONLY valid JSON, no markdown`,
+                        systemPrompt: 'You are a course recommendation AI. OUTPUT ONLY RAW JSON. NO MARKDOWN. NO BACKTICKS.',
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('AI Response:', data.response);
+
+                    // Parse AI response
+                    let cleanJson = data.response.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const firstBracket = cleanJson.indexOf('[');
+                    const lastBracket = cleanJson.lastIndexOf(']');
+
+                    if (firstBracket !== -1 && lastBracket !== -1) {
+                        cleanJson = cleanJson.substring(firstBracket, lastBracket + 1);
+                    }
+
+                    const recommendations = JSON.parse(cleanJson);
+
+                    // Map recommendations to actual courses
+                    const recommended: any[] = [];
+                    const reasons: Record<string, string> = {};
+
+                    for (const rec of recommendations) {
+                        const courseIndex = rec.courseIndex - 1; // Convert to 0-based index
+                        if (courseIndex >= 0 && courseIndex < availableCourses.length) {
+                            const course = availableCourses[courseIndex];
+                            recommended.push(course);
+                            reasons[course.id] = rec.reason;
+                        }
+                    }
+
+                    setRecommendedCourses(recommended.slice(0, 3)); // Ensure max 3
+                    setAiReason(reasons);
+                } else {
+                    throw new Error(data.error || 'Failed to get recommendations');
+                }
+            } catch (err) {
+                console.error('AI Recommendation error:', err);
+                // Fallback: just show first 3 courses
+                setRecommendedCourses(availableCourses.slice(0, 3));
+                setError('AI recommendations unavailable. Showing popular courses.');
+            } finally {
+                setIsLoading(false);
+                setIsGenerating(false);
+            }
+        };
+
+        generateRecommendations();
+    }, [availableCourses, preferences]);
+
+    const regenerateRecommendations = () => {
+        setIsLoading(true);
+        setRecommendedCourses([]);
+        // Re-trigger by updating a dummy state or just re-run the effect
+        const fetchAndRecommend = async () => {
+            // Re-fetch to get latest courses
+            try {
+                const response = await fetch('/api/courses/available');
+                if (response.ok) {
+                    const data = await response.json();
+                    setAvailableCourses([...data]); // This will trigger the useEffect
+                }
+            } catch (err) {
+                setError('Failed to refresh recommendations');
+                setIsLoading(false);
+            }
+        };
+        fetchAndRecommend();
+    };
+
+    if (isLoading || isGenerating) {
         return (
             <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50">
                 <div className="flex flex-col items-center justify-center h-48">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">Creating personalized learning paths for {preferences.name}...</p>
+                    <p className="text-gray-500 dark:text-gray-400">
+                        {isGenerating ? `AI is finding the best courses for ${preferences.name}...` : 'Loading courses...'}
+                    </p>
                 </div>
             </Card>
         );
@@ -1039,103 +1132,151 @@ const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferenc
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-pink-100 dark:from-blue-900/30 dark:to-pink-900/30 flex items-center justify-center">
-                            <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Learning Paths</h2>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">AI-curated for {preferences.name}</p>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI-Recommended Courses</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Personalized picks for {preferences.name}</p>
                         </div>
                     </div>
-                    <Button variant="secondary" onClick={generatePaths} disabled={isGenerating}>
+                    <Button
+                        variant="secondary"
+                        onClick={regenerateRecommendations}
+                        disabled={isGenerating}
+                    >
                         <RefreshCw className={clsx("w-4 h-4 mr-2", isGenerating && "animate-spin")} />
-                        Regenerate
+                        Get New Picks
                     </Button>
                 </div>
 
-                {learningPaths.length === 0 ? (
+                {error && (
+                    <div className="mb-4 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 text-sm">
+                        {error}
+                    </div>
+                )}
+
+                {recommendedCourses.length === 0 ? (
                     <div className="text-center py-8">
-                        <p className="text-gray-500 dark:text-gray-400">No learning paths generated yet</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-4">No courses available to recommend yet</p>
+                        <Button onClick={() => window.location.href = '/dashboard/courses'}>
+                            Browse All Courses
+                        </Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {learningPaths.map((path) => (
-                            <motion.div
-                                key={path.id}
-                                whileHover={{ scale: 1.02 }}
-                                className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors cursor-pointer group"
-                                onClick={() => setSelectedPath(path)}
-                            >
-                                <div className="flex items-start justify-between mb-4">
-                                    <div
-                                        className="w-12 h-12 rounded-xl flex items-center justify-center"
-                                        style={{ backgroundColor: `${path.color}20` }}
-                                    >
-                                        <path.icon className="w-6 h-6" style={{ color: path.color }} />
+                        {recommendedCourses.map((course, index) => {
+                            const colors = ['#3B82F6', '#EC4899', '#10B981'];
+                            const color = colors[index % colors.length];
+
+                            return (
+                                <motion.div
+                                    key={course.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    whileHover={{ scale: 1.02 }}
+                                    className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors cursor-pointer group border border-gray-200/50 dark:border-gray-700/50"
+                                    onClick={() => setSelectedCourse(course)}
+                                >
+                                    {/* Rank Badge */}
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div
+                                            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+                                            style={{ backgroundColor: color }}
+                                        >
+                                            #{index + 1}
+                                        </div>
+                                        {course.isEnrolled ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                                                Enrolled
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                                ${course.price}
+                                            </span>
+                                        )}
                                     </div>
-                                    <span className={clsx(
-                                        'px-2 py-1 rounded-full text-xs font-medium',
-                                        path.level === 'Beginner' && 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-                                        path.level === 'Intermediate' && 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400',
-                                        path.level === 'Advanced' && 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-                                    )}>
-                                        {path.level}
-                                    </span>
-                                </div>
 
-                                <h3 className="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                    {path.title}
-                                </h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                                    {path.description}
-                                </p>
+                                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                                        {course.title}
+                                    </h3>
 
-                                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                    <span className="flex items-center gap-1">
-                                        <BookOpen className="w-3 h-3" />
-                                        {path.lessons.length} lessons
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <Clock className="w-3 h-3" />
-                                        {path.duration}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        ))}
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                                        {course.description}
+                                    </p>
+
+                                    {/* AI Reason */}
+                                    {aiReason[course.id] && (
+                                        <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 mb-3">
+                                            <div className="flex items-start gap-2">
+                                                <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                                    {aiReason[course.id]}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                                        <span className="flex items-center gap-1">
+                                            <Star className="w-3 h-3" />
+                                            {course._count?.enrollments || 0} students
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <BookOpen className="w-3 h-3" />
+                                            {course._count?.lessons || 0} lessons
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {/* View All Link */}
+                {recommendedCourses.length > 0 && (
+                    <div className="mt-6 text-center">
+                        <Button
+                            variant="secondary"
+                            onClick={() => window.location.href = '/dashboard/courses'}
+                        >
+                            View All {availableCourses.length} Courses
+                            <ChevronRight className="w-4 h-4 ml-2" />
+                        </Button>
                     </div>
                 )}
             </Card>
 
-            {/* Path Detail Modal */}
+            {/* Course Detail Modal */}
             <AnimatePresence>
-                {selectedPath && (
+                {selectedCourse && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+                        onClick={() => setSelectedCourse(null)}
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+                            className="bg-white dark:bg-gray-900 rounded-2xl max-w-lg w-full overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div
-                                            className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                                            style={{ backgroundColor: `${selectedPath.color}20` }}
-                                        >
-                                            <selectedPath.icon className="w-7 h-7" style={{ color: selectedPath.color }} />
+                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-pink-100 dark:from-blue-900/30 dark:to-pink-900/30 flex items-center justify-center">
+                                            <GraduationCap className="w-7 h-7 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <div>
-                                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{selectedPath.title}</h2>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{selectedPath.description}</p>
+                                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{selectedCourse.title}</h2>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">{selectedCourse.category}</p>
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => setSelectedPath(null)}
+                                        onClick={() => setSelectedCourse(null)}
                                         className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                     >
                                         <X className="w-5 h-5 text-gray-500" />
@@ -1143,26 +1284,65 @@ const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferenc
                                 </div>
                             </div>
 
-                            <div className="p-6 overflow-y-auto max-h-[60vh]">
-                                <div className="space-y-3">
-                                    {selectedPath.lessons.map((lesson, index) => (
-                                        <div
-                                            key={lesson.id}
-                                            className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center gap-4"
-                                        >
-                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 font-medium">
-                                                {index + 1}
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-medium text-gray-900 dark:text-white">{lesson.title}</h4>
-                                                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                                                    <Clock className="w-3 h-3" />
-                                                    {lesson.duration}
+                            <div className="p-6 space-y-4">
+                                <p className="text-gray-600 dark:text-gray-300">
+                                    {selectedCourse.description}
+                                </p>
+
+                                {aiReason[selectedCourse.id] && (
+                                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-pink-50 dark:from-blue-900/20 dark:to-pink-900/20">
+                                        <div className="flex items-start gap-3">
+                                            <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                                            <div>
+                                                <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">Why this course?</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                    {aiReason[selectedCourse.id]}
                                                 </p>
                                             </div>
-                                            <ChevronRight className="w-5 h-5 text-gray-400" />
                                         </div>
-                                    ))}
+                                    </div>
+                                )}
+
+                                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="flex items-center gap-1">
+                                        <Star className="w-4 h-4" />
+                                        {selectedCourse._count?.enrollments || 0} students enrolled
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <BookOpen className="w-4 h-4" />
+                                        {selectedCourse._count?.lessons || 0} lessons
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center gap-2 pt-2">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-100 to-blue-100 dark:from-pink-900/30 dark:to-blue-900/30 flex items-center justify-center">
+                                        <span className="text-xs font-medium text-pink-600 dark:text-pink-400">
+                                            {selectedCourse.teacher?.name?.charAt(0) || 'T'}
+                                        </span>
+                                    </div>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        {selectedCourse.teacher?.name || 'Unknown Teacher'}
+                                    </span>
+                                </div>
+
+                                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    {selectedCourse.isEnrolled ? (
+                                        <Button
+                                            className="w-full bg-green-600 hover:bg-green-700"
+                                            onClick={() => window.location.href = '/dashboard/courses'}
+                                        >
+                                            <Check className="w-4 h-4 mr-2" />
+                                            Already Enrolled - Go to Course
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            className="w-full bg-gradient-to-r from-pink-600 to-blue-600 hover:from-pink-700 hover:to-blue-700"
+                                            onClick={() => window.location.href = '/dashboard/courses'}
+                                        >
+                                            Enroll Now - ${selectedCourse.price}
+                                            <ChevronRight className="w-4 h-4 ml-2" />
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>
@@ -1172,6 +1352,8 @@ const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferenc
         </>
     );
 };
+
+
 
 // Main Component
 export default function LearningHubPage() {

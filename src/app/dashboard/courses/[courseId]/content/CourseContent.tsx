@@ -308,14 +308,8 @@ export default function CourseContent({ courseId }: { courseId: string }) {
     );
   }
 
-  if (session?.user?.role !== 'teacher') {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Access Denied</h2>
-        <p className="text-gray-600 dark:text-gray-400">You don&apos;t have permission to access this page.</p>
-      </div>
-    );
-  }
+  // Determine if user can edit (teachers can add/delete content)
+  const canEdit = session?.user?.role === 'teacher' || session?.user?.role === 'admin';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
@@ -323,7 +317,7 @@ export default function CourseContent({ courseId }: { courseId: string }) {
       <div className="mb-8 pt-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div className="flex items-center space-x-4">
-            <Link href="/dashboard/courses/manage">
+            <Link href={canEdit ? "/dashboard/courses/manage" : "/dashboard/student"}>
               <Button variant="secondary" className="!p-2 hover:scale-105 transition-transform">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
@@ -333,23 +327,25 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                 Course Content
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-1">
-                Add and manage your course materials
+                {canEdit ? 'Add and manage your course materials' : 'Watch and learn from course materials'}
               </p>
             </div>
           </div>
-          <Link 
-            href={`/dashboard/courses/preview/${courseId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button 
-              variant="secondary" 
-              className="flex items-center justify-center space-x-2 w-full sm:w-auto group hover:border-blue-500 transition-colors"
+          {canEdit && (
+            <Link
+              href={`/dashboard/courses/preview/${courseId}`}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <Eye className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-              <span className="group-hover:text-blue-500 transition-colors">Preview Course</span>
-            </Button>
-          </Link>
+              <Button
+                variant="secondary"
+                className="flex items-center justify-center space-x-2 w-full sm:w-auto group hover:border-blue-500 transition-colors"
+              >
+                <Eye className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
+                <span className="group-hover:text-blue-500 transition-colors">Preview Course</span>
+              </Button>
+            </Link>
+          )}
         </div>
 
         {error && (
@@ -405,13 +401,15 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                           {selectedVideo.description}
                         </p>
                       </div>
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleDeleteVideo(selectedVideo)}
-                        className="!p-1.5 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 transition-colors !w-[26px] h-[26px] flex items-center justify-center"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                      </Button>
+                      {canEdit && (
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleDeleteVideo(selectedVideo)}
+                          className="!p-1.5 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 transition-colors !w-[26px] h-[26px] flex items-center justify-center"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -442,8 +440,9 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                     {videos.map((video) => (
                       <div
                         key={video._id}
+                        onClick={() => setSelectedVideo(video)}
                         className={clsx(
-                          'p-4 rounded-lg border transition-colors duration-200',
+                          'p-4 rounded-lg border transition-colors duration-200 cursor-pointer',
                           selectedVideo?._id === video._id
                             ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
                             : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'
@@ -462,73 +461,77 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                             </p>
                           </div>
                         </div>
-                        <Button
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteVideo(video);
-                          }}
-                          className="!p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 scale-90 hover:scale-100 flex-shrink-0 !w-[26px] h-[26px] flex items-center justify-center"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                        </Button>
+                        {canEdit && (
+                          <Button
+                            variant="secondary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteVideo(video);
+                            }}
+                            className="!p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 scale-90 hover:scale-100 flex-shrink-0 !w-[26px] h-[26px] flex items-center justify-center"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Add Video Form */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                  <h2 className="font-semibold text-gray-900 dark:text-white">Add New Video</h2>
-                </div>
-                <form onSubmit={handleAddVideo} className="p-6 space-y-4">
-                  <Input
-                    label="Video Title"
-                    value={newVideo.title}
-                    onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
-                    required
-                  />
-                  <div className="space-y-2">
+              {/* Add Video Form - Only for teachers */}
+              {canEdit && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <h2 className="font-semibold text-gray-900 dark:text-white">Add New Video</h2>
+                  </div>
+                  <form onSubmit={handleAddVideo} className="p-6 space-y-4">
                     <Input
-                      label="YouTube Video URL"
-                      value={newVideo.url}
-                      onChange={(e) => {
-                        setNewVideo({ ...newVideo, url: e.target.value });
-                        setUrlError('');
-                      }}
-                      error={urlError}
-                      placeholder="https://www.youtube.com/watch?v=..."
+                      label="Video Title"
+                      value={newVideo.title}
+                      onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
                       required
                     />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-1">
-                      <Play className="w-3 h-3" />
-                      <span>Supported: youtube.com/watch?v=..., youtu.be/...</span>
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Description
-                    </label>
-                    <textarea
-                      value={newVideo.description}
-                      onChange={(e) => setNewVideo({ ...newVideo, description: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-lg transition-colors duration-200 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                      rows={3}
-                      required
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    disabled={isLoading}
-                    className="w-full !bg-gradient-to-r !from-pink-500 !to-blue-500 hover:!from-pink-600 hover:!to-blue-600 !py-3 !text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
-                  >
-                    <Plus className="w-5 h-5 mr-2" />
-                    {isLoading ? 'Adding...' : 'Add Video'}
-                  </Button>
-                </form>
-              </div>
+                    <div className="space-y-2">
+                      <Input
+                        label="YouTube Video URL"
+                        value={newVideo.url}
+                        onChange={(e) => {
+                          setNewVideo({ ...newVideo, url: e.target.value });
+                          setUrlError('');
+                        }}
+                        error={urlError}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        required
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center space-x-1">
+                        <Play className="w-3 h-3" />
+                        <span>Supported: youtube.com/watch?v=..., youtu.be/...</span>
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Description
+                      </label>
+                      <textarea
+                        value={newVideo.description}
+                        onChange={(e) => setNewVideo({ ...newVideo, description: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-lg transition-colors duration-200 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                        rows={3}
+                        required
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full !bg-gradient-to-r !from-pink-500 !to-blue-500 hover:!from-pink-600 hover:!to-blue-600 !py-3 !text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+                    >
+                      <Plus className="w-5 h-5 mr-2" />
+                      {isLoading ? 'Adding...' : 'Add Video'}
+                    </Button>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -565,13 +568,15 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                           {selectedPdf.description}
                         </p>
                       </div>
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleDeletePdf(selectedPdf)}
-                        className="!p-1.5 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 transition-colors !w-[26px] h-[26px] flex items-center justify-center"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                      </Button>
+                      {canEdit && (
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleDeletePdf(selectedPdf)}
+                          className="!p-1.5 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 transition-colors !w-[26px] h-[26px] flex items-center justify-center"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -602,8 +607,9 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                     {pdfs.map((pdf) => (
                       <div
                         key={pdf._id}
+                        onClick={() => setSelectedPdf(pdf)}
                         className={clsx(
-                          'p-4 rounded-lg border transition-colors duration-200',
+                          'p-4 rounded-lg border transition-colors duration-200 cursor-pointer',
                           selectedPdf?._id === pdf._id
                             ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
                             : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400'
@@ -622,99 +628,103 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                             </p>
                           </div>
                         </div>
-                        <Button
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletePdf(pdf);
-                          }}
-                          className="!p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 scale-90 hover:scale-100 flex-shrink-0 !w-[26px] h-[26px] flex items-center justify-center"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                        </Button>
+                        {canEdit && (
+                          <Button
+                            variant="secondary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeletePdf(pdf);
+                            }}
+                            className="!p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:!bg-red-50 dark:hover:!bg-red-900/20 hover:border-red-500 scale-90 hover:scale-100 flex-shrink-0 !w-[26px] h-[26px] flex items-center justify-center"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Add PDF Form */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                  <h2 className="font-semibold text-gray-900 dark:text-white">Add New PDF</h2>
-                </div>
-                <form onSubmit={handleAddPdf} className="p-6 space-y-4">
-                  <Input
-                    label="PDF Title"
-                    value={newPdf.title}
-                    onChange={(e) => setNewPdf({ ...newPdf, title: e.target.value })}
-                    required
-                  />
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Upload PDF File
-                    </label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
-                      <div className="space-y-1 text-center">
-                        <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                          <label htmlFor="file-upload" className="relative cursor-pointer rounded-md font-medium text-blue-600 dark:text-blue-500 hover:text-blue-500 focus-within:outline-none">
-                            <span>Upload a file</span>
-                            <input 
-                              id="file-upload" 
-                              name="file-upload" 
-                              type="file" 
-                              className="sr-only"
-                              accept="application/pdf"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0] || null;
-                                setPdfFile(file);
-                                setPdfFileError('');
-                              }}
-                            />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          PDF up to 10MB
-                        </p>
-                        {pdfFile && (
-                          <p className="text-sm font-medium text-green-600 dark:text-green-400 flex items-center justify-center mt-2">
-                            <FileText className="w-4 h-4 mr-1" />
-                            {pdfFile.name}
-                          </p>
-                        )}
-                        {pdfFileError && (
-                          <p className="text-sm font-medium text-red-600 dark:text-red-400 mt-2">
-                            {pdfFileError}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+              {/* Add PDF Form - Only for teachers */}
+              {canEdit && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <h2 className="font-semibold text-gray-900 dark:text-white">Add New PDF</h2>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Description
-                    </label>
-                    <textarea
-                      value={newPdf.description}
-                      onChange={(e) => setNewPdf({ ...newPdf, description: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-lg transition-colors duration-200 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                      rows={3}
+                  <form onSubmit={handleAddPdf} className="p-6 space-y-4">
+                    <Input
+                      label="PDF Title"
+                      value={newPdf.title}
+                      onChange={(e) => setNewPdf({ ...newPdf, title: e.target.value })}
                       required
                     />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    disabled={isLoading}
-                    className="w-full !bg-gradient-to-r !from-pink-500 !to-blue-500 hover:!from-pink-600 hover:!to-blue-600 !py-3 !text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
-                  >
-                    <Upload className="w-5 h-5 mr-2" />
-                    {isLoading ? 'Uploading...' : 'Upload PDF'}
-                  </Button>
-                </form>
-              </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Upload PDF File
+                      </label>
+                      <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 transition-colors">
+                        <div className="space-y-1 text-center">
+                          <div className="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label htmlFor="file-upload" className="relative cursor-pointer rounded-md font-medium text-blue-600 dark:text-blue-500 hover:text-blue-500 focus-within:outline-none">
+                              <span>Upload a file</span>
+                              <input
+                                id="file-upload"
+                                name="file-upload"
+                                type="file"
+                                className="sr-only"
+                                accept="application/pdf"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0] || null;
+                                  setPdfFile(file);
+                                  setPdfFileError('');
+                                }}
+                              />
+                            </label>
+                            <p className="pl-1">or drag and drop</p>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            PDF up to 10MB
+                          </p>
+                          {pdfFile && (
+                            <p className="text-sm font-medium text-green-600 dark:text-green-400 flex items-center justify-center mt-2">
+                              <FileText className="w-4 h-4 mr-1" />
+                              {pdfFile.name}
+                            </p>
+                          )}
+                          {pdfFileError && (
+                            <p className="text-sm font-medium text-red-600 dark:text-red-400 mt-2">
+                              {pdfFileError}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Description
+                      </label>
+                      <textarea
+                        value={newPdf.description}
+                        onChange={(e) => setNewPdf({ ...newPdf, description: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-lg transition-colors duration-200 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                        rows={3}
+                        required
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full !bg-gradient-to-r !from-pink-500 !to-blue-500 hover:!from-pink-600 hover:!to-blue-600 !py-3 !text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98]"
+                    >
+                      <Upload className="w-5 h-5 mr-2" />
+                      {isLoading ? 'Uploading...' : 'Upload PDF'}
+                    </Button>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -736,7 +746,7 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="mb-6">
                 <p className="text-gray-600 dark:text-gray-400">
                   Are you sure you want to delete the video &quot;{videoToDelete?.title}&quot;? This action cannot be undone.
@@ -786,7 +796,7 @@ export default function CourseContent({ courseId }: { courseId: string }) {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="mb-6">
                 <p className="text-gray-600 dark:text-gray-400">
                   Are you sure you want to delete the PDF &quot;{pdfToDelete?.title}&quot;? This action cannot be undone.
