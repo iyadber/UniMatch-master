@@ -14,7 +14,7 @@ declare module 'next-auth' {
     email?: string | null;
     password?: string;
   }
-  
+
   interface Session {
     user: {
       id: string;
@@ -67,7 +67,7 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email
+            email: credentials.email.toLowerCase()
           },
           select: {
             id: true,
@@ -82,14 +82,10 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // This is just for debugging - don't leave this in production code
-        console.log("Found user with email:", credentials.email);
-        console.log("Comparing passwords...");
         const passwordsMatch = await bcrypt.compare(
           credentials.password,
           user.password
         );
-        console.log("Passwords match:", passwordsMatch);
 
         if (!passwordsMatch) {
           return null;

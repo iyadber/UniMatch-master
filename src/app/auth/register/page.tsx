@@ -54,7 +54,7 @@ export default function RegisterPage() {
         },
         body: JSON.stringify({
           name: formData.name,
-          email: formData.email,
+          email: formData.email.toLowerCase(),
           password: formData.password,
           role: formData.role,
         }),
@@ -67,9 +67,9 @@ export default function RegisterPage() {
       }
 
       console.log('Registration successful:', data);
-      
+
       // Redirect to login page with success message
-      router.push('/auth/signin?registered=true');
+      router.push(`/auth/signin?registered=true&email=${encodeURIComponent(formData.email.toLowerCase())}`);
     } catch (error) {
       console.error('Registration error:', error);
       setError(error instanceof Error ? error.message : 'Failed to register');
@@ -148,21 +148,19 @@ export default function RegisterPage() {
                   checked={formData.role === 'student'}
                   onChange={handleChange}
                 />
-                <div className={`p-3 rounded-lg border-2 transition-all ${
-                  formData.role === 'student'
+                <div className={`p-3 rounded-lg border-2 transition-all ${formData.role === 'student'
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700'
-                }`}>
+                  }`}>
                   <div className="flex flex-col items-center">
                     <svg className="w-6 h-6 mb-1 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v7" />
                     </svg>
-                    <span className={`block font-medium ${
-                      formData.role === 'student'
+                    <span className={`block font-medium ${formData.role === 'student'
                         ? 'text-blue-600 dark:text-blue-400'
                         : 'text-gray-700 dark:text-gray-300'
-                    }`}>Student</span>
+                      }`}>Student</span>
                   </div>
                 </div>
               </label>
@@ -176,11 +174,10 @@ export default function RegisterPage() {
                   checked={formData.role === 'teacher'}
                   onChange={handleChange}
                 />
-                <div className={`p-3 rounded-lg border-2 transition-all ${
-                  formData.role === 'teacher'
+                <div className={`p-3 rounded-lg border-2 transition-all ${formData.role === 'teacher'
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                     : 'border-gray-200 dark:border-gray-700'
-                }`}>
+                  }`}>
                   <div className="flex flex-col items-center">
                     <svg className="w-6 h-6 mb-1 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
@@ -190,11 +187,10 @@ export default function RegisterPage() {
                         d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                       />
                     </svg>
-                    <span className={`block font-medium ${
-                      formData.role === 'teacher'
+                    <span className={`block font-medium ${formData.role === 'teacher'
                         ? 'text-blue-600 dark:text-blue-400'
                         : 'text-gray-700 dark:text-gray-300'
-                    }`}>Teacher</span>
+                      }`}>Teacher</span>
                   </div>
                 </div>
               </label>

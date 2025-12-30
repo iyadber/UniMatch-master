@@ -13,11 +13,23 @@ class WebSocketHandler {
   private maxLoggedConnections = 5;
 
   initialize(server: Server): void {
-    this.wss = new WebSocketServer({ server });
+    this.wss = new WebSocketServer({ noServer: true });
+
+    server.on('upgrade', (request, socket, head) => {
+      const { pathname } = new URL(request.url || '', `http://${request.headers.host}`);
+
+      if (pathname?.startsWith('/_next/')) {
+        return;
+      }
+
+      this.wss?.handleUpgrade(request, socket, head, (ws) => {
+        this.wss?.emit('connection', ws, request);
+      });
+    });
 
     this.wss.on('connection', (ws: WS) => {
       this.connectionCount++;
-      
+
       // Only log first few connections to avoid console spam
       if (this.connectionCount <= this.maxLoggedConnections) {
         console.log(`WebSocket connection #${this.connectionCount}`);
@@ -37,7 +49,7 @@ class WebSocketHandler {
 
       ws.on('close', () => {
         this.connectionCount = Math.max(0, this.connectionCount - 1);
-        
+
         // Remove client from the map when they disconnect
         for (const [userId, client] of this.clients.entries()) {
           if (client === ws) {

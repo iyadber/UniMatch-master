@@ -34,13 +34,6 @@ export async function POST(request: Request) {
     // Hash password consistently with bcryptjs
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(validatedData.password, salt);
-    
-    // Log password details for debugging
-    console.log("Registration - password hash info:", {
-      passwordLength: validatedData.password.length,
-      hashPrefix: hashedPassword.substring(0, 10) + "...",
-      saltRounds: 10
-    });
 
     // Create new user with Prisma
     const newUser = await prisma.user.create({
@@ -59,7 +52,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { 
+      {
         message: 'User registered successfully',
         user: newUser
       },
@@ -67,14 +60,14 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error('Registration error:', error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: error.errors[0].message },
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
       { message: 'Failed to register user' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { InputHTMLAttributes, forwardRef, useState } from 'react';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -9,17 +10,22 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, icon, ...props }, ref) => {
+  ({ label, error, className, icon, type, ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const isValueFilled = props.value && String(props.value).length > 0;
+
+    // Handle password visibility toggle
+    const isPasswordType = type === 'password';
+    const inputType = isPasswordType ? (showPassword ? 'text' : 'password') : type;
 
     return (
       <div className="space-y-2">
-        <label 
+        <label
           className={clsx(
             "block text-sm font-medium transition-colors duration-200",
-            isFocused 
-              ? "text-blue-600 dark:text-blue-400" 
+            isFocused
+              ? "text-blue-600 dark:text-blue-400"
               : "text-gray-700 dark:text-gray-300"
           )}
         >
@@ -33,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {/* Background glow effect */}
           <AnimatePresence>
             {isFocused && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -53,9 +59,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 {icon}
               </div>
             )}
-            
+
             <input
               ref={ref}
+              type={inputType}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               className={clsx(
@@ -65,40 +72,61 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 'text-gray-900 dark:text-gray-100',
                 'placeholder-gray-400/80 dark:placeholder-gray-500/80',
                 'focus:outline-none',
-                icon ? 'pl-10 pr-4' : 'px-4',
+                icon ? 'pl-10' : 'px-4',
+                isPasswordType ? 'pr-10' : 'pr-4',
                 'py-3',
                 'rounded-xl',
                 error
                   ? 'border-red-500/50 dark:border-red-500/50 focus:border-red-500 dark:focus:border-red-500'
-                  : isFocused 
-                    ? 'border-blue-500/50 dark:border-blue-500/30' 
+                  : isFocused
+                    ? 'border-blue-500/50 dark:border-blue-500/30'
                     : 'border-gray-200 dark:border-gray-700',
                 isValueFilled && !error ? 'border-green-500/30 dark:border-green-500/20' : '',
                 className
               )}
               {...props}
             />
+
+            {/* Password Toggle Button */}
+            {isPasswordType && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className={clsx(
+                  "absolute right-3 z-20 p-1 rounded-full",
+                  "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
+                  "transition-colors duration-200 focus:outline-none"
+                )}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            )}
           </div>
         </div>
-        
+
         <AnimatePresence>
           {error && (
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="text-sm text-red-600 dark:text-red-400 flex items-center"
             >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 20 20" 
-                fill="currentColor" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
                 className="w-4 h-4 mr-1.5 flex-shrink-0"
               >
-                <path 
-                  fillRule="evenodd" 
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" 
-                  clipRule="evenodd" 
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                  clipRule="evenodd"
                 />
               </svg>
               {error}
