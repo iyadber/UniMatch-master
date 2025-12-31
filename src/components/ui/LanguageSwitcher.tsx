@@ -18,7 +18,7 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ isCollapsed = false }: LanguageSwitcherProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const { language, setLanguage } = useLanguage();
+    const { language, setLanguage, dir } = useLanguage();
 
     const currentLanguage = languages.find(l => l.code === language) || languages[0];
 
@@ -44,11 +44,12 @@ export function LanguageSwitcher({ isCollapsed = false }: LanguageSwitcherProps)
                                 onClick={() => setIsOpen(false)}
                             />
                             <motion.div
-                                initial={{ opacity: 0, x: -10 }}
+                                initial={{ opacity: 0, x: dir === 'rtl' ? 10 : -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
+                                exit={{ opacity: 0, x: dir === 'rtl' ? 10 : -10 }}
                                 className={clsx(
-                                    'absolute left-full top-0 ml-2 z-50',
+                                    dir === 'rtl' ? 'right-full mr-2' : 'left-full ml-2',
+                                    'absolute top-0 z-50',
                                     'bg-white dark:bg-gray-800 rounded-xl shadow-lg',
                                     'border border-gray-200 dark:border-gray-700',
                                     'py-2 min-w-[160px]'

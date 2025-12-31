@@ -15,64 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-
-const stats = [
-    {
-        name: 'Total Sessions',
-        value: '24',
-        icon: Clock,
-        change: '+12%',
-        changeType: 'positive',
-    },
-    {
-        name: 'Active Students',
-        value: '48',
-        icon: Users,
-        change: '+18%',
-        changeType: 'positive',
-    },
-    {
-        name: 'Courses',
-        value: '12',
-        icon: GraduationCap,
-        change: '+3',
-        changeType: 'positive',
-    },
-    {
-        name: 'Average Rating',
-        value: '4.8',
-        icon: Star,
-        change: '+0.2',
-        changeType: 'positive',
-    },
-];
-
-const recentActivity = [
-    {
-        id: 1,
-        type: 'session',
-        title: 'Mathematics Session',
-        time: '2 hours ago',
-        description: 'Completed a session with Dr. Sarah Wilson',
-        icon: Clock,
-    },
-    {
-        id: 2,
-        type: 'message',
-        title: 'New Message',
-        time: '4 hours ago',
-        description: 'Prof. Michael Brown replied to your inquiry',
-        icon: MessageSquare,
-    },
-    {
-        id: 3,
-        type: 'course',
-        title: 'Course Enrollment',
-        time: '1 day ago',
-        description: 'Enrolled in Advanced Physics Course',
-        icon: BookOpen,
-    },
-];
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const container = {
     hidden: { opacity: 0 },
@@ -91,7 +34,66 @@ const item = {
 
 export default function Dashboard() {
     const { data: session } = useSession();
+    const { t, dir } = useLanguage();
     const isTeacher = session?.user?.role === 'teacher';
+
+    const stats = [
+        {
+            name: t('dashboard.stats.totalSessions'),
+            value: '24',
+            icon: Clock,
+            change: '+12%',
+            changeType: 'positive',
+        },
+        {
+            name: t('dashboard.stats.activeStudents'),
+            value: '48',
+            icon: Users,
+            change: '+18%',
+            changeType: 'positive',
+        },
+        {
+            name: t('dashboard.stats.courses'),
+            value: '12',
+            icon: GraduationCap,
+            change: '+3',
+            changeType: 'positive',
+        },
+        {
+            name: t('dashboard.stats.avgRating'),
+            value: '4.8',
+            icon: Star,
+            change: '+0.2',
+            changeType: 'positive',
+        },
+    ];
+
+    const recentActivity = [
+        {
+            id: 1,
+            type: 'session',
+            title: 'Mathematics Session',
+            time: '2 hours ago',
+            description: 'Completed a session with Dr. Sarah Wilson',
+            icon: Clock,
+        },
+        {
+            id: 2,
+            type: 'message',
+            title: 'New Message',
+            time: '4 hours ago',
+            description: 'Prof. Michael Brown replied to your inquiry',
+            icon: MessageSquare,
+        },
+        {
+            id: 3,
+            type: 'course',
+            title: 'Course Enrollment',
+            time: '1 day ago',
+            description: 'Enrolled in Advanced Physics Course',
+            icon: BookOpen,
+        },
+    ];
 
     return (
         <motion.div
@@ -101,27 +103,27 @@ export default function Dashboard() {
         >
             <div className="flex justify-between items-center">
                 <motion.div
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
                 >
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent">
-                        Dashboard
+                        {t('dashboard.title')}
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        An AI Ecosystem Connecting Students with PhD Researchers — Where Intelligence Finds Its Match.
+                        {t('home.subtitle')}
                     </p>
                 </motion.div>
                 {isTeacher && (
                     <motion.div
-                        initial={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
                     >
                         <Link href="/dashboard/courses/create">
                             <Button className="bg-gradient-to-r from-pink-600 to-blue-600 hover:from-pink-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
-                                <Plus className="w-4 h-4 mr-2" />
-                                <span>Create Course</span>
+                                <Plus className={dir === 'rtl' ? "w-4 h-4 ml-2" : "w-4 h-4 mr-2"} />
+                                <span>{t('dashboard.createCourse')}</span>
                             </Button>
                         </Link>
                     </motion.div>
@@ -146,10 +148,10 @@ export default function Dashboard() {
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-200">
-                                                Manage Courses
+                                                {t('dashboard.manageCourses')}
                                             </h3>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                Create and manage your courses
+                                                {t('dashboard.manageCoursesDesc')}
                                             </p>
                                         </div>
                                     </div>
@@ -192,7 +194,7 @@ export default function Dashboard() {
                                     >
                                         {stat.change}
                                     </span>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400"> vs last month</span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400"> {t('dashboard.stats.vsLastMonth')}</span>
                                 </div>
                             </div>
                         </Card>
@@ -211,7 +213,7 @@ export default function Dashboard() {
                         <div className="flex items-center gap-3">
                             <Activity className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                             <h2 className="text-lg font-semibold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent">
-                                Recent Activity
+                                {t('dashboard.recentActivity')}
                             </h2>
                         </div>
                     </div>
@@ -225,12 +227,12 @@ export default function Dashboard() {
                                     transition={{ delay: index * 0.1 }}
                                     className="p-6 hover:bg-gradient-to-r hover:from-pink-50/50 hover:to-blue-50/50 dark:hover:from-pink-900/10 dark:hover:to-blue-900/10 transition-colors duration-200"
                                 >
-                                    <div className="flex items-center gap-4">
+                                    <div className={`flex items-center gap-4 ${dir === 'rtl' ? 'flex-row-reverse text-right' : ''}`}>
                                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-blue-100 dark:from-pink-900/30 dark:to-blue-900/30 flex items-center justify-center">
                                             <activity.icon className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="flex items-center justify-between">
+                                            <div className={`flex items-center justify-between ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
                                                 <p className="font-medium text-gray-900 dark:text-white">{activity.title}</p>
                                                 <span className="text-sm text-gray-500 dark:text-gray-400">{activity.time}</span>
                                             </div>
@@ -255,18 +257,10 @@ export default function Dashboard() {
                         <div className="p-6">
                             <div className="text-center">
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                                    No courses yet
+                                    {t('dashboard.noCoursesTitle')}
                                 </h3>
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    You haven&apos;t created any courses yet. Get started by creating your first course.
-                                </p>
-                            </div>
-                            <div className="text-center">
-                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                                    No courses yet
-                                </h3>
-                                <p className="text-gray-500 dark:text-gray-400">
-                                    You haven&apos;t enrolled in any courses yet. Browse available courses to get started.
+                                    {t('dashboard.noCreatedCourses')}
                                 </p>
                             </div>
                         </div>

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 import clsx from 'clsx';
 
 // Types
@@ -63,6 +64,11 @@ const formatTime = (dateStr: string | null | undefined) => {
   if (days === 0) {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   } else if (days === 1) {
+    // We'll handle translation of "Yesterday" in the component or via a helper that accepts t
+    return 'Yesterday'; // This string will be replaced by t('messages.yesterday') usage site if passed through helper, but here it's static. 
+    // Better to return a key or handle inside component. For now let's keep it simple and translate inside component if possible or just use a key if I can pass t.
+    // Since this is outside component, I can't easily access t.
+    // I will modify the usage site to handle translation or pass t to this function.
     return 'Yesterday';
   } else if (days < 7) {
     return date.toLocaleDateString([], { weekday: 'short' });
@@ -108,14 +114,14 @@ const ContactItem = ({
         </h3>
         {contact.lastMessageTime && (
           <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0 ml-2">
-            {formatTime(contact.lastMessageTime)}
+            {contact.lastMessageTime && (formatTime(contact.lastMessageTime) === 'Yesterday' ? (window as any).t_yesterday || 'Yesterday' : formatTime(contact.lastMessageTime))}
           </span>
         )}
       </div>
       <div className="flex items-center justify-between mt-0.5">
         <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
           {contact.isTyping ? (
-            <span className="text-green-500">typing...</span>
+            <span className="text-green-500">{(window as any).t_typing || 'typing...'}</span>
           ) : (
             contact.lastMessage || contact.role
           )}
@@ -201,6 +207,12 @@ export default function MessagesPage() {
   const [showNewChat, setShowNewChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
+
+  // Hack to allow formatTime to use translation
+  useEffect(() => {
+    (window as any).t_yesterday = t('messages.yesterday');
+  }, [t]);
 
   const currentUserId = session?.user?.id;
 
@@ -366,7 +378,7 @@ export default function MessagesPage() {
       <div className="h-[calc(100vh-8rem)] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">Loading messages...</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('messages.loading')}</p>
         </div>
       </div>
     );
@@ -389,7 +401,7 @@ export default function MessagesPage() {
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                Messages
+                {t('messages.title')}
               </h1>
               <div className="flex items-center gap-2">
                 <Button
@@ -408,7 +420,7 @@ export default function MessagesPage() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search conversations..."
+                placeholder={t('messages.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-900 border-0 text-gray-900 dark:text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -422,7 +434,7 @@ export default function MessagesPage() {
               <div className="p-3 bg-blue-50 dark:bg-blue-900/20">
                 <p className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1">
                   <UserPlus className="w-3 h-3" />
-                  Start a new conversation
+                  {t('messages.startNew')}
                 </p>
               </div>
               <div className="max-h-48 overflow-y-auto">
@@ -443,17 +455,17 @@ export default function MessagesPage() {
             {filteredContacts.length === 0 && filteredPotentialContacts.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4">
                 <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
-                <p className="text-sm">No conversations yet</p>
+                <p className="text-sm">{t('messages.noConversations')}</p>
                 <p className="text-xs text-center mt-2">
                   {session?.user?.role === 'student'
-                    ? 'Enroll in a course or book a session to message teachers'
-                    : 'Your students will appear here'}
+                    ? t('messages.studentEmptyState')
+                    : t('messages.teacherEmptyState')}
                 </p>
               </div>
             ) : filteredContacts.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 p-4">
                 <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
-                <p className="text-sm">No matching conversations</p>
+                <p className="text-sm">{t('messages.noMatching')}</p>
               </div>
             ) : (
               <div>
@@ -525,8 +537,8 @@ export default function MessagesPage() {
                 ) : messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
                     <MessageSquare className="w-12 h-12 mb-3 opacity-50" />
-                    <p className="text-sm">No messages yet</p>
-                    <p className="text-xs mt-1">Send a message to start the conversation</p>
+                    <p className="text-sm">{t('messages.noMessages')}</p>
+                    <p className="text-xs mt-1">{t('messages.startPrompt')}</p>
                   </div>
                 ) : (
                   messages.map((message) => (
@@ -556,7 +568,7 @@ export default function MessagesPage() {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={handleKeyDown}
-                      placeholder="Type a message..."
+                      placeholder={t('messages.typePlaceholder')}
                       disabled={sending}
                       className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-900 border-0 text-gray-900 dark:text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
@@ -581,24 +593,24 @@ export default function MessagesPage() {
                 <MessageSquare className="w-12 h-12 text-blue-600 dark:text-blue-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Welcome to Messages
+                {t('messages.welcome')}
               </h2>
               <p className="text-gray-500 dark:text-gray-400 max-w-md mb-6">
-                Connect with your {session?.user?.role === 'student' ? 'tutors' : 'students'}. Select a conversation from the list to start messaging.
+                {session?.user?.role === 'student' ? t('messages.welcomeDesc.student') : t('messages.welcomeDesc.teacher')}
               </p>
               <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center gap-2">
                   <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium">
                     {contacts.length}
                   </span>
-                  <span>conversations</span>
+                  <span>{t('messages.conversationsCount')}</span>
                 </div>
                 {totalUnread > 0 && (
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full text-xs font-medium">
                       {totalUnread}
                     </span>
-                    <span>unread</span>
+                    <span>{t('messages.unreadCount')}</span>
                   </div>
                 )}
               </div>

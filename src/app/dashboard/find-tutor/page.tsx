@@ -26,6 +26,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import clsx from 'clsx';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Types
 interface Tutor {
@@ -107,6 +108,7 @@ const AIMatchingModal = ({
     onClose: () => void;
     onMatch: (request: AIMatchRequest) => void;
 }) => {
+    const { t, dir } = useLanguage();
     const [step, setStep] = useState(1);
     const [request, setRequest] = useState<AIMatchRequest>({
         subject: '',
@@ -170,10 +172,10 @@ const AIMatchingModal = ({
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                    AI Tutor Matching
+                                    {t('aiMatch.title')}
                                 </h2>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Step {step} of {totalSteps}
+                                    {t('aiMatch.step')} {step} {t('aiMatch.of')} {totalSteps}
                                 </p>
                             </div>
                         </div>
@@ -199,31 +201,31 @@ const AIMatchingModal = ({
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-4">
                                         <BookOpen className="w-5 h-5" />
-                                        <span className="font-medium">What do you need help with?</span>
+                                        <span className="font-medium">{t('aiMatch.subjectQuestion')}</span>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Subject Area
+                                            {t('aiMatch.subjectArea')}
                                         </label>
                                         <select
                                             value={request.subject}
                                             onChange={(e) => setRequest({ ...request, subject: e.target.value })}
                                             className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                                         >
-                                            <option value="">Select a subject...</option>
+                                            <option value="">{t('aiMatch.selectSubject')}</option>
                                             {subjects.filter(s => s !== 'All Subjects').map((s) => (
-                                                <option key={s} value={s}>{s}</option>
+                                                <option key={s} value={s}>{t(`category.${s.replace(/\s+/g, '')}`) || s}</option>
                                             ))}
                                         </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Specific Topic or Question
+                                            {t('aiMatch.topicLabel')}
                                         </label>
                                         <textarea
                                             value={request.topic}
                                             onChange={(e) => setRequest({ ...request, topic: e.target.value })}
-                                            placeholder="Describe what you need help with... (e.g., 'I need help understanding neural networks for my deep learning course')"
+                                            placeholder={t('aiMatch.topicPlaceholder')}
                                             className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white resize-none h-24"
                                         />
                                     </div>
@@ -235,7 +237,7 @@ const AIMatchingModal = ({
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400 mb-4">
                                         <Target className="w-5 h-5" />
-                                        <span className="font-medium">What's your main goal?</span>
+                                        <span className="font-medium">{t('aiMatch.goalQuestion')}</span>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         {learningGoals.map((goal) => (
@@ -255,7 +257,7 @@ const AIMatchingModal = ({
                                                         ? 'text-pink-600 dark:text-pink-400'
                                                         : 'text-gray-700 dark:text-gray-300'
                                                 )}>
-                                                    {goal}
+                                                    {t(`goal.${goal}`) || goal}
                                                 </span>
                                             </button>
                                         ))}
@@ -268,7 +270,7 @@ const AIMatchingModal = ({
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-4">
                                         <Brain className="w-5 h-5" />
-                                        <span className="font-medium">How do you prefer to learn?</span>
+                                        <span className="font-medium">{t('aiMatch.styleQuestion')}</span>
                                     </div>
                                     <div className="space-y-3">
                                         {learningStyles.map((style) => (
@@ -288,7 +290,7 @@ const AIMatchingModal = ({
                                                         ? 'text-purple-600 dark:text-purple-400'
                                                         : 'text-gray-700 dark:text-gray-300'
                                                 )}>
-                                                    {style}
+                                                    {t(`style.${style}`) || style}
                                                 </span>
                                             </button>
                                         ))}
@@ -302,7 +304,7 @@ const AIMatchingModal = ({
                                     <div>
                                         <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-4">
                                             <DollarSign className="w-5 h-5" />
-                                            <span className="font-medium">Budget preference</span>
+                                            <span className="font-medium">{t('aiMatch.budgetQuestion')}</span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
                                             {budgetOptions.map((budget) => (
@@ -316,7 +318,7 @@ const AIMatchingModal = ({
                                                             : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-green-300'
                                                     )}
                                                 >
-                                                    {budget}
+                                                    {t(`budget.${budget}`) || budget}
                                                 </button>
                                             ))}
                                         </div>
@@ -324,7 +326,7 @@ const AIMatchingModal = ({
                                     <div>
                                         <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 mb-4">
                                             <Clock className="w-5 h-5" />
-                                            <span className="font-medium">How urgent?</span>
+                                            <span className="font-medium">{t('aiMatch.urgencyQuestion')}</span>
                                         </div>
                                         <div className="grid grid-cols-3 gap-3">
                                             {urgencyOptions.map((urgency) => (
@@ -338,7 +340,7 @@ const AIMatchingModal = ({
                                                             : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-orange-300'
                                                     )}
                                                 >
-                                                    {urgency}
+                                                    {t(`urgency.${urgency}`) || urgency}
                                                 </button>
                                             ))}
                                         </div>
@@ -354,7 +356,7 @@ const AIMatchingModal = ({
                             onClick={() => step > 1 ? setStep(step - 1) : onClose()}
                             className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
                         >
-                            {step === 1 ? 'Cancel' : 'Back'}
+                            {step === 1 ? t('aiMatch.cancel') : t('aiMatch.back')}
                         </button>
                         <div className="flex gap-2">
                             {Array.from({ length: totalSteps }).map((_, i) => (
@@ -371,12 +373,12 @@ const AIMatchingModal = ({
                             {step === totalSteps ? (
                                 <>
                                     <Sparkles className="w-4 h-4 mr-2" />
-                                    Find Matches
+                                    {t('aiMatch.findMatches')}
                                 </>
                             ) : (
                                 <>
-                                    Continue
-                                    <ArrowRight className="w-4 h-4 ml-2" />
+                                    {t('aiMatch.continue')}
+                                    {dir === 'rtl' ? <ArrowRight className="w-4 h-4 mr-2 rotate-180" /> : <ArrowRight className="w-4 h-4 ml-2" />}
                                 </>
                             )}
                         </Button>
@@ -401,6 +403,7 @@ const AIMatchingResults = ({
     isLoading: boolean;
     matchRequest: AIMatchRequest | null;
 }) => {
+    const { t } = useLanguage();
     if (!isOpen) return null;
 
     return (
@@ -424,7 +427,7 @@ const AIMatchingResults = ({
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                    AI-Recommended Tutors
+                                    {t('aiResults.title')}
                                 </h2>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
                                     {matchRequest?.subject} • {matchRequest?.learningGoal}
@@ -449,10 +452,10 @@ const AIMatchingResults = ({
                                 </div>
                             </div>
                             <p className="text-gray-600 dark:text-gray-400 mt-4 text-center">
-                                AI is analyzing tutors to find your perfect match...
+                                {t('aiResults.analyzing')}
                             </p>
                             <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                                Considering expertise, teaching style, and availability
+                                {t('aiResults.analyzingDesc')}
                             </p>
                         </div>
                     ) : (
@@ -473,7 +476,7 @@ const AIMatchingResults = ({
                                     {index === 0 && (
                                         <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm font-medium mb-3">
                                             <Zap className="w-4 h-4" />
-                                            Best Match for You
+                                            {t('aiResults.bestMatch')}
                                         </div>
                                     )}
                                     <div className="flex items-start gap-4">
@@ -499,14 +502,14 @@ const AIMatchingResults = ({
                                                                 ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
                                                                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                                                     )}>
-                                                        {tutor.matchScore}% Match
+                                                        {tutor.matchScore}% {t('aiResults.match')}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {tutor.aiMatchReason && (
                                                 <div className="mt-2 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-sm text-blue-700 dark:text-blue-300">
-                                                    <span className="font-medium">AI Insight:</span> {tutor.aiMatchReason}
+                                                    <span className="font-medium">{t('aiResults.aiInsight')}:</span> {tutor.aiMatchReason}
                                                 </div>
                                             )}
 
@@ -524,7 +527,7 @@ const AIMatchingResults = ({
                                             <div className="flex items-center gap-4 mt-3 text-sm">
                                                 <span className="flex items-center gap-1 text-yellow-600">
                                                     <Star className="w-4 h-4 fill-yellow-500" />
-                                                    {tutor.rating} ({tutor.reviews})
+                                                    {tutor.rating} ({tutor.reviews} {t('tutor.reviews')})
                                                 </span>
                                                 <span className="text-gray-500 dark:text-gray-400">
                                                     ${tutor.hourlyRate}/hr
@@ -541,11 +544,11 @@ const AIMatchingResults = ({
                                             <div className="flex gap-2 mt-4">
                                                 <Button variant="secondary" className="flex-1">
                                                     <MessageSquare className="w-4 h-4 mr-2" />
-                                                    Message
+                                                    {t('tutor.message')}
                                                 </Button>
                                                 <Button className="flex-1">
                                                     <Calendar className="w-4 h-4 mr-2" />
-                                                    Book Session
+                                                    {t('tutor.bookSession')}
                                                 </Button>
                                             </div>
                                         </div>
@@ -576,6 +579,7 @@ const item = {
 
 // Main Component
 export default function FindTutorPage() {
+    const { t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('All Subjects');
     const [showFilters, setShowFilters] = useState(false);
@@ -745,10 +749,10 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                     transition={{ duration: 0.5 }}
                 >
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
-                        Find a PhD Tutor
+                        {t('findTutor.title')}
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        Connect with expert PhD researchers for personalized tutoring
+                        {t('findTutor.subtitle')}
                     </p>
                 </motion.div>
 
@@ -759,7 +763,7 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                             <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search by name, subject, or expertise..."
+                                placeholder={t('findTutor.searchPlaceholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className={clsx(
@@ -786,7 +790,7 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                                     )}
                                 >
                                     {subjects.map((subject) => (
-                                        <option key={subject} value={subject}>{subject}</option>
+                                        <option key={subject} value={subject}>{t(`category.${subject.replace(/\s+/g, '')}`) || subject}</option>
                                     ))}
                                 </select>
                                 <ChevronDown className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -797,7 +801,7 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                                 className="px-4"
                             >
                                 <Filter className="w-4 h-4 mr-2" />
-                                Filters
+                                {t('findTutor.filters')}
                             </Button>
                         </div>
                     </div>
@@ -812,28 +816,28 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                         >
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Price Range ($/hour)
+                                    {t('filter.priceRange')}
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="number"
-                                        placeholder="Min"
+                                        placeholder={t('filter.min')}
                                         className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm"
                                     />
                                     <span className="text-gray-400">-</span>
                                     <input
                                         type="number"
-                                        placeholder="Max"
+                                        placeholder={t('filter.max')}
                                         className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm"
                                     />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Rating
+                                    {t('filter.rating')}
                                 </label>
                                 <select className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm">
-                                    <option>Any Rating</option>
+                                    <option>{t('filter.anyRating')}</option>
                                     <option>4.5+</option>
                                     <option>4.0+</option>
                                     <option>3.5+</option>
@@ -841,13 +845,13 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Availability
+                                    {t('filter.availability')}
                                 </label>
                                 <select className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm">
-                                    <option>Anytime</option>
-                                    <option>Available Now</option>
-                                    <option>Today</option>
-                                    <option>This Week</option>
+                                    <option>{t('filter.anytime')}</option>
+                                    <option>{t('filter.availableNow')}</option>
+                                    <option>{t('filter.today')}</option>
+                                    <option>{t('filter.thisWeek')}</option>
                                 </select>
                             </div>
                         </motion.div>
@@ -862,9 +866,9 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                                 <Sparkles className="w-7 h-7" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-semibold">AI-Powered Matching</h3>
+                                <h3 className="text-lg font-semibold">{t('aiBanner.title')}</h3>
                                 <p className="text-white/80 text-sm">
-                                    Our AI analyzes your learning style and goals to find the perfect tutor match
+                                    {t('aiBanner.desc')}
                                 </p>
                             </div>
                         </div>
@@ -873,7 +877,7 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                             onClick={() => setShowAIModal(true)}
                         >
                             <Sparkles className="w-4 h-4 mr-2" />
-                            Get AI Recommendations
+                            {t('aiBanner.button')}
                         </Button>
                     </div>
                 </Card>
@@ -942,21 +946,21 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                                             <Users className="w-4 h-4 text-blue-500" />
                                             <span className="font-semibold text-gray-900 dark:text-white">{tutor.students}</span>
                                         </div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">students</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('tutor.students')}</p>
                                     </div>
                                     <div className="text-center">
                                         <div className="flex items-center justify-center gap-1">
                                             <Clock className="w-4 h-4 text-green-500" />
                                             <span className="font-semibold text-gray-900 dark:text-white">{tutor.responseTime}</span>
                                         </div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">response</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('tutor.response')}</p>
                                     </div>
                                     <div className="text-center">
                                         <div className="flex items-center justify-center gap-1">
                                             <DollarSign className="w-4 h-4 text-purple-500" />
                                             <span className="font-semibold text-gray-900 dark:text-white">${tutor.hourlyRate}</span>
                                         </div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">per hour</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('tutor.perHour')}</p>
                                     </div>
                                 </div>
 
@@ -988,7 +992,7 @@ Return ONLY a valid JSON array with format: [{"id": number, "matchScore": number
                 {filteredTutors.length === 0 && (
                     <div className="text-center py-12">
                         <p className="text-gray-500 dark:text-gray-400">
-                            No tutors found matching your criteria. Try adjusting your search.
+                            {t('findTutor.noTutorsDesc')}
                         </p>
                     </div>
                 )}

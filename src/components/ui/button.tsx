@@ -82,7 +82,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
         {/* Button content */}
         <div className={`flex items-center justify-center ${isLoading ? 'invisible' : 'visible'}`}>
-          {icon && <span className="mr-2">{icon}</span>}
+          {icon && <span className="me-2">{icon}</span>}
           {children}
         </div>
       </motion.button>

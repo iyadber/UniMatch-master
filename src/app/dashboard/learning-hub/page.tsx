@@ -36,6 +36,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AIChat } from '@/components/ai/AIChat';
 import clsx from 'clsx';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Storage key for user preferences
 const PREFERENCES_KEY = 'unimatch-learning-preferences';
@@ -110,10 +111,10 @@ const goalOptions = [
 ];
 
 const learningStyleOptions = [
-    { id: 'visual', label: 'Visual', desc: 'I learn best with videos and diagrams' },
-    { id: 'reading', label: 'Reading/Writing', desc: 'I prefer articles and notes' },
-    { id: 'hands-on', label: 'Hands-on', desc: 'I learn by doing and practicing' },
-    { id: 'mixed', label: 'Mixed', desc: 'A combination of all styles' },
+    { id: 'visual', label: 'pref.visual', desc: 'pref.visualDesc' },
+    { id: 'reading', label: 'pref.reading', desc: 'pref.readingDesc' },
+    { id: 'hands-on', label: 'pref.handson', desc: 'pref.handsonDesc' },
+    { id: 'mixed', label: 'pref.mixed', desc: 'pref.mixedDesc' },
 ];
 
 const experienceLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
@@ -129,7 +130,6 @@ const defaultPreferences: UserPreferences = {
     weeklyHours: '4-7 hours',
     hasCompletedOnboarding: false,
 };
-
 // Onboarding Modal Component
 const OnboardingModal = ({
     onComplete,
@@ -138,6 +138,7 @@ const OnboardingModal = ({
     onComplete: (prefs: UserPreferences) => void;
     initialPreferences: UserPreferences;
 }) => {
+    const { t, dir } = useLanguage();
     const [step, setStep] = useState(1);
     const [prefs, setPrefs] = useState<UserPreferences>(initialPreferences);
     const totalSteps = 5;
@@ -220,18 +221,18 @@ const OnboardingModal = ({
                             {step === 5 && <Clock className="w-8 h-8 text-green-600 dark:text-green-400" />}
                         </motion.div>
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            {step === 1 && "Welcome to AI Learning Hub!"}
-                            {step === 2 && "What do you want to learn?"}
-                            {step === 3 && "What are your goals?"}
-                            {step === 4 && "How do you learn best?"}
-                            {step === 5 && "Almost there!"}
+                            {step === 1 && t('onboarding.welcome')}
+                            {step === 2 && t('onboarding.subjects')}
+                            {step === 3 && t('onboarding.goals')}
+                            {step === 4 && t('onboarding.style')}
+                            {step === 5 && t('onboarding.almostThere')}
                         </h2>
                         <p className="text-gray-500 dark:text-gray-400 mt-2">
-                            {step === 1 && "Let's personalize your learning experience"}
-                            {step === 2 && "Select all subjects that interest you"}
-                            {step === 3 && "Choose your learning objectives"}
-                            {step === 4 && "We'll adapt content to your style"}
-                            {step === 5 && "Just a couple more preferences"}
+                            {step === 1 && t('onboarding.welcomeDesc')}
+                            {step === 2 && t('onboarding.subjectsDesc')}
+                            {step === 3 && t('onboarding.goalsDesc')}
+                            {step === 4 && t('onboarding.styleDesc')}
+                            {step === 5 && t('onboarding.almostThereDesc')}
                         </p>
                     </div>
 
@@ -244,22 +245,21 @@ const OnboardingModal = ({
                             exit={{ opacity: 0, x: -20 }}
                             className="min-h-[280px]"
                         >
-                            {/* Step 1: Name */}
                             {step === 1 && (
                                 <div className="space-y-4">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        What should we call you?
+                                        {t('onboarding.nameQuestion')}
                                     </label>
                                     <input
                                         type="text"
                                         value={prefs.name}
                                         onChange={(e) => setPrefs({ ...prefs, name: e.target.value })}
-                                        placeholder="Enter your name"
+                                        placeholder={t('onboarding.namePlaceholder')}
                                         className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white text-lg"
                                         autoFocus
                                     />
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        This helps us personalize your learning experience
+                                        {t('onboarding.nameHint')}
                                     </p>
                                 </div>
                             )}
@@ -345,10 +345,10 @@ const OnboardingModal = ({
                                             )}
                                         >
                                             <div className="font-medium text-gray-900 dark:text-white">
-                                                {style.label}
+                                                {t(style.label)}
                                             </div>
                                             <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                {style.desc}
+                                                {t(style.desc)}
                                             </div>
                                         </button>
                                     ))}
@@ -360,7 +360,7 @@ const OnboardingModal = ({
                                 <div className="space-y-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                            Your experience level
+                                            {t('onboarding.experienceLevel')}
                                         </label>
                                         <div className="flex gap-2">
                                             {experienceLevels.map((level) => (
@@ -381,7 +381,7 @@ const OnboardingModal = ({
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                            Weekly study time
+                                            {t('onboarding.weeklyStudyTime')}
                                         </label>
                                         <div className="grid grid-cols-2 gap-2">
                                             {weeklyHoursOptions.map((hours) => (
@@ -417,8 +417,8 @@ const OnboardingModal = ({
                                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                             )}
                         >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back
+                            <ArrowLeft className={clsx("w-4 h-4", dir === 'rtl' ? 'ml-2' : 'mr-2')} />
+                            {t('onboarding.back')}
                         </button>
                         <div className="flex items-center gap-2">
                             {Array.from({ length: totalSteps }).map((_, i) => (
@@ -439,9 +439,9 @@ const OnboardingModal = ({
                             onClick={handleNext}
                             disabled={!canContinue()}
                         >
-                            {step === totalSteps ? 'Get Started' : 'Continue'}
-                            {step < totalSteps && <ArrowRight className="w-4 h-4 ml-2" />}
-                            {step === totalSteps && <Sparkles className="w-4 h-4 ml-2" />}
+                            {step === totalSteps ? t('onboarding.getStarted') : t('onboarding.continue')}
+                            {step < totalSteps && <ArrowRight className={clsx("w-4 h-4", dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2')} />}
+                            {step === totalSteps && <Sparkles className={clsx("w-4 h-4", dir === 'rtl' ? 'mr-2' : 'ml-2')} />}
                         </Button>
                     </div>
                 </div>
@@ -465,38 +465,42 @@ const AIToolCard = ({
     color: string;
     onClick: () => void;
     isActive: boolean;
-}) => (
-    <button
-        onClick={onClick}
-        className={clsx(
-            'w-full p-6 rounded-2xl text-left transition-all duration-300',
-            'bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg',
-            'border-2',
-            isActive
-                ? 'border-blue-500 shadow-lg shadow-blue-500/20'
-                : 'border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300 dark:hover:border-blue-700',
-            'hover:shadow-xl cursor-pointer group'
-        )}
-    >
-        <div className={clsx(
-            'w-14 h-14 rounded-2xl flex items-center justify-center mb-4',
-            'bg-gradient-to-br',
-            color,
-            'group-hover:scale-110 transition-transform duration-300'
-        )}>
-            <Icon className="w-7 h-7 text-white" />
-        </div>
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            {name}
-        </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-            {description}
-        </p>
-    </button>
-);
+}) => {
+    const { t } = useLanguage();
+    return (
+        <button
+            onClick={onClick}
+            className={clsx(
+                'w-full p-6 rounded-2xl text-left transition-all duration-300',
+                'bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg',
+                'border-2',
+                isActive
+                    ? 'border-blue-500 shadow-lg shadow-blue-500/20'
+                    : 'border-gray-200/50 dark:border-gray-700/50 hover:border-blue-300 dark:hover:border-blue-700',
+                'hover:shadow-xl cursor-pointer group'
+            )}
+        >
+            <div className={clsx(
+                'w-14 h-14 rounded-2xl flex items-center justify-center mb-4',
+                'bg-gradient-to-br',
+                color,
+                'group-hover:scale-110 transition-transform duration-300'
+            )}>
+                <Icon className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {t(name)}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t(description)}
+            </p>
+        </button>
+    );
+};
 
 // Flashcard Viewer Component
 const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
+    const { t, dir } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -570,7 +574,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
         return (
             <div className="flex flex-col items-center justify-center h-64">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">Generating personalized flashcards...</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('flashcards.generating')}</p>
             </div>
         );
     }
@@ -578,10 +582,10 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
     if (cards.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-64">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No flashcards yet</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t('flashcards.empty')}</p>
                 <Button onClick={() => generateFlashcards(true)} disabled={isGenerating}>
                     {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                    Generate Flashcards
+                    {t('flashcards.generate')}
                 </Button>
             </div>
         );
@@ -591,7 +595,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    AI-Generated Flashcards for {preferences.name}
+                    {t('flashcards.title').replace('{name}', preferences.name)}
                 </h3>
                 <Button variant="secondary" onClick={() => generateFlashcards(false)} disabled={isGenerating}>
                     {isGenerating ? (
@@ -599,7 +603,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
                     ) : (
                         <Plus className="w-4 h-4 mr-2" />
                     )}
-                    Generate More
+                    {t('flashcards.generateMore')}
                 </Button>
             </div>
 
@@ -623,7 +627,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
                             {currentCard?.topic}
                         </p>
                         <p className="text-xl font-medium">{currentCard?.question}</p>
-                        <p className="text-xs mt-4 opacity-70">Click to reveal answer</p>
+                        <p className="text-xs mt-4 opacity-70">{t('flashcards.clickToReveal')}</p>
                     </div>
 
                     <div
@@ -643,15 +647,15 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
 
             <div className="flex items-center justify-between">
                 <Button variant="secondary" onClick={prevCard}>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Previous
+                    <ArrowLeft className={clsx("w-4 h-4", dir === 'rtl' ? 'ml-2' : 'mr-2')} />
+                    {t('flashcards.previous')}
                 </Button>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                     {currentIndex + 1} / {cards.length}
                 </span>
                 <Button variant="secondary" onClick={nextCard}>
-                    Next
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    {t('flashcards.next')}
+                    <ArrowRight className={clsx("w-4 h-4", dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2')} />
                 </Button>
             </div>
         </div>
@@ -660,6 +664,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
 
 // Quiz Viewer Component
 const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
+    const { t, dir } = useLanguage();
     const [questions, setQuestions] = useState<QuizQuestion[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -738,7 +743,7 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
         return (
             <div className="flex flex-col items-center justify-center h-64">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">Generating personalized quiz for {preferences.name}...</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('quiz.generating').replace('{name}', preferences.name)}</p>
             </div>
         );
     }
@@ -746,10 +751,10 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
     if (questions.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-64">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">Could not generate quiz</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t('quiz.error')}</p>
                 <Button onClick={generateQuiz}>
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Try Again
+                    {t('quiz.tryAgain')}
                 </Button>
             </div>
         );
@@ -762,14 +767,14 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
                     <Star className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    Great job, {preferences.name}!
+                    {t('quiz.completedTitle').replace('{name}', preferences.name)}
                 </h3>
                 <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                    You scored {score} out of {questions.length}
+                    {t('quiz.completedScore').replace('{score}', score.toString()).replace('{total}', questions.length.toString())}
                 </p>
                 <Button onClick={restartQuiz}>
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Try New Quiz
+                    {t('quiz.tryNew')}
                 </Button>
             </div>
         );
@@ -781,10 +786,10 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Personalized Quiz
+                    {t('quiz.title')}
                 </h3>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Question {currentQuestion + 1} of {questions.length}
+                    {t('quiz.questionCount').replace('{current}', (currentQuestion + 1).toString()).replace('{total}', questions.length.toString())}
                 </span>
             </div>
 
@@ -842,8 +847,8 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
             {showResult && (
                 <div className="flex justify-end">
                     <Button onClick={nextQuestion}>
-                        {currentQuestion < questions.length - 1 ? 'Next Question' : 'See Results'}
-                        <ArrowRight className="w-4 h-4 ml-2" />
+                        {currentQuestion < questions.length - 1 ? t('quiz.nextQuestion') : t('quiz.seeResults')}
+                        <ArrowRight className={clsx("w-4 h-4", dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2')} />
                     </Button>
                 </div>
             )}
@@ -853,6 +858,7 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
 
 // AI Summarizer Component
 const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
+    const { t } = useLanguage();
     const [topic, setTopic] = useState('');
     const [summary, setSummary] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -892,13 +898,13 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    AI Content Generator
+                    {t('summarizer.title')}
                 </h3>
                 <div className="flex gap-2">
                     {[
-                        { id: 'summary' as const, label: 'Summarize' },
-                        { id: 'explain' as const, label: 'Explain' },
-                        { id: 'practice' as const, label: 'Practice' },
+                        { id: 'summary' as const, label: 'summarizer.mode.summarize' },
+                        { id: 'explain' as const, label: 'summarizer.mode.explain' },
+                        { id: 'practice' as const, label: 'summarizer.mode.practice' },
                     ].map((mode) => (
                         <button
                             key={mode.id}
@@ -910,14 +916,14 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
                                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                             )}
                         >
-                            {mode.label}
+                            {t(mode.label)}
                         </button>
                     ))}
                 </div>
             </div>
 
             <p className="text-sm text-gray-500 dark:text-gray-400">
-                Content personalized for {preferences.name} ({preferences.experienceLevel} level, {preferences.learningStyle} learner)
+                {t('summarizer.personalizedFor').replace('{name}', preferences.name).replace('{level}', preferences.experienceLevel).replace('{style}', preferences.learningStyle)}
             </p>
 
             <textarea
@@ -925,10 +931,10 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder={
                     activeMode === 'summary'
-                        ? "Enter a topic to summarize..."
+                        ? t('summarizer.placeholder.summary')
                         : activeMode === 'explain'
-                            ? "Enter a concept to explain..."
-                            : "Enter a subject for practice problems..."
+                            ? t('summarizer.placeholder.explain')
+                            : t('summarizer.placeholder.practice')
                 }
                 className="w-full h-32 p-4 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
             />
@@ -939,7 +945,7 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
                 ) : (
                     <Sparkles className="w-4 h-4 mr-2" />
                 )}
-                {isLoading ? 'Generating...' : `Generate ${activeMode === 'summary' ? 'Summary' : activeMode === 'explain' ? 'Explanation' : 'Practice Problems'}`}
+                {isLoading ? t('summarizer.button.generating') : `${t('summarizer.button.generate')} ${activeMode === 'summary' ? t('summarizer.mode.summarize') : activeMode === 'explain' ? t('summarizer.mode.explain') : t('summarizer.mode.practice')}`}
             </Button>
 
             {summary && (
@@ -951,7 +957,7 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
                     <div className="flex items-center gap-2 mb-4">
                         <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         <h4 className="font-semibold text-gray-900 dark:text-white">
-                            AI Generated Content
+                            {t('summarizer.resultTitle')}
                         </h4>
                     </div>
                     <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -966,7 +972,9 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
 };
 
 // AI-Powered Course Recommendations - Recommends 3 real courses from database
+// AI-Powered Course Recommendations - Recommends 3 real courses from database
 const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferences }) => {
+    const { t, dir } = useLanguage();
     const [availableCourses, setAvailableCourses] = useState<any[]>([]);
     const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<any | null>(null);
@@ -1119,7 +1127,7 @@ RULES:
                 <div className="flex flex-col items-center justify-center h-48">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
                     <p className="text-gray-500 dark:text-gray-400">
-                        {isGenerating ? `AI is finding the best courses for ${preferences.name}...` : 'Loading courses...'}
+                        {isGenerating ? t('recommendations.loading').replace('{name}', preferences.name) : t('common.loading')}
                     </p>
                 </div>
             </Card>
@@ -1135,8 +1143,8 @@ RULES:
                             <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI-Recommended Courses</h2>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Personalized picks for {preferences.name}</p>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('recommendations.title')}</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('recommendations.subtitle').replace('{name}', preferences.name)}</p>
                         </div>
                     </div>
                     <Button
@@ -1145,7 +1153,7 @@ RULES:
                         disabled={isGenerating}
                     >
                         <RefreshCw className={clsx("w-4 h-4 mr-2", isGenerating && "animate-spin")} />
-                        Get New Picks
+                        {t('recommendations.getNewPicks')}
                     </Button>
                 </div>
 
@@ -1157,9 +1165,9 @@ RULES:
 
                 {recommendedCourses.length === 0 ? (
                     <div className="text-center py-8">
-                        <p className="text-gray-500 dark:text-gray-400 mb-4">No courses available to recommend yet</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-4">{t('recommendations.noCourses')}</p>
                         <Button onClick={() => window.location.href = '/dashboard/courses'}>
-                            Browse All Courses
+                            {t('recommendations.browseAll')}
                         </Button>
                     </div>
                 ) : (
@@ -1188,7 +1196,7 @@ RULES:
                                         </div>
                                         {course.isEnrolled ? (
                                             <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
-                                                Enrolled
+                                                {t('recommendations.enrolled')}
                                             </span>
                                         ) : (
                                             <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
@@ -1220,11 +1228,11 @@ RULES:
                                     <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                                         <span className="flex items-center gap-1">
                                             <Star className="w-3 h-3" />
-                                            {course._count?.enrollments || 0} students
+                                            {course._count?.enrollments || 0} {t('recommendations.students')}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <BookOpen className="w-3 h-3" />
-                                            {course._count?.lessons || 0} lessons
+                                            {course._count?.lessons || 0} {t('recommendations.lessons')}
                                         </span>
                                     </div>
                                 </motion.div>
@@ -1240,8 +1248,8 @@ RULES:
                             variant="secondary"
                             onClick={() => window.location.href = '/dashboard/courses'}
                         >
-                            View All {availableCourses.length} Courses
-                            <ChevronRight className="w-4 h-4 ml-2" />
+                            {t('recommendations.viewAll').replace('{count}', availableCourses.length.toString())}
+                            <ChevronRight className={clsx("w-4 h-4", dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2')} />
                         </Button>
                     </div>
                 )}
@@ -1294,7 +1302,7 @@ RULES:
                                         <div className="flex items-start gap-3">
                                             <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                                             <div>
-                                                <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">Why this course?</p>
+                                                <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{t('recommendations.whyThisCourse')}</p>
                                                 <p className="text-sm text-gray-600 dark:text-gray-300">
                                                     {aiReason[selectedCourse.id]}
                                                 </p>
@@ -1321,7 +1329,7 @@ RULES:
                                         </span>
                                     </div>
                                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                                        {selectedCourse.teacher?.name || 'Unknown Teacher'}
+                                        {selectedCourse.teacher?.name || t('recommendations.unknownTeacher')}
                                     </span>
                                 </div>
 
@@ -1332,15 +1340,15 @@ RULES:
                                             onClick={() => window.location.href = '/dashboard/courses'}
                                         >
                                             <Check className="w-4 h-4 mr-2" />
-                                            Already Enrolled - Go to Course
+                                            {t('recommendations.alreadyEnrolled')}
                                         </Button>
                                     ) : (
                                         <Button
                                             className="w-full bg-gradient-to-r from-pink-600 to-blue-600 hover:from-pink-700 hover:to-blue-700"
                                             onClick={() => window.location.href = '/dashboard/courses'}
                                         >
-                                            Enroll Now - ${selectedCourse.price}
-                                            <ChevronRight className="w-4 h-4 ml-2" />
+                                            {t('recommendations.enrollNow')} - ${selectedCourse.price}
+                                            <ChevronRight className={clsx("w-4 h-4", dir === 'rtl' ? 'mr-2 rotate-180' : 'ml-2')} />
                                         </Button>
                                     )}
                                 </div>
@@ -1357,6 +1365,7 @@ RULES:
 
 // Main Component
 export default function LearningHubPage() {
+    const { t } = useLanguage();
     const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -1390,29 +1399,29 @@ export default function LearningHubPage() {
         {
             id: 'assistant',
             icon: Sparkles,
-            name: 'AI Study Assistant',
-            description: 'Get instant answers to your study questions',
+            name: 'aiTool.assistant.name',
+            description: 'aiTool.assistant.desc',
             color: 'from-blue-500 to-purple-500',
         },
         {
             id: 'flashcards',
             icon: Zap,
-            name: 'Smart Flashcards',
-            description: 'AI-generated flashcards for efficient learning',
+            name: 'aiTool.flashcards.name',
+            description: 'aiTool.flashcards.desc',
             color: 'from-pink-500 to-orange-500',
         },
         {
             id: 'quiz',
             icon: FileText,
-            name: 'Practice Quizzes',
-            description: 'Adaptive quizzes that match your level',
+            name: 'aiTool.quiz.name',
+            description: 'aiTool.quiz.desc',
             color: 'from-green-500 to-teal-500',
         },
         {
             id: 'summary',
             icon: Video,
-            name: 'AI Summarizer',
-            description: 'Get concise summaries of complex topics',
+            name: 'aiTool.summarizer.name',
+            description: 'aiTool.summarizer.desc',
             color: 'from-purple-500 to-indigo-500',
         },
     ];
@@ -1451,12 +1460,12 @@ export default function LearningHubPage() {
                 >
                     <div>
                         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
-                            {preferences.hasCompletedOnboarding ? `Welcome back, ${preferences.name}!` : 'AI Learning Hub'}
+                            {preferences.hasCompletedOnboarding ? `${t('learningHub.title.welcomeBack')} ${preferences.name}!` : t('learningHub.title.generic')}
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
                             {preferences.hasCompletedOnboarding
-                                ? `Personalized ${preferences.experienceLevel.toLowerCase()} learning • ${preferences.weeklyHours}/week`
-                                : 'Personalized learning powered by artificial intelligence'}
+                                ? t('learningHub.subtitle.personal').replace('{level}', preferences.experienceLevel.toLowerCase()).replace('{hours}', preferences.weeklyHours)
+                                : t('learningHub.subtitle.generic')}
                         </p>
                     </div>
                     {preferences.hasCompletedOnboarding && (
@@ -1465,7 +1474,7 @@ export default function LearningHubPage() {
                             onClick={() => setShowOnboarding(true)}
                         >
                             <GraduationCap className="w-4 h-4 mr-2" />
-                            Update Preferences
+                            {t('learningHub.updatePreferences')}
                         </Button>
                     )}
                 </motion.div>

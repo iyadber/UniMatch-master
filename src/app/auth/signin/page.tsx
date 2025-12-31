@@ -1,11 +1,16 @@
+'use client';
+
 import { Suspense } from 'react';
 import SignInForm from './SignInForm';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SignInPage() {
+  const { t } = useLanguage();
+
   return (
     <Suspense fallback={
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Loading...</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('common.loading')}</h2>
       </div>
     }>
       <SignInForm />

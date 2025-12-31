@@ -11,6 +11,7 @@ import { ScrollArea } from '@/components/ui/ScrollArea';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Course {
   id: string;
@@ -61,6 +62,7 @@ const categories = [
 
 export default function CoursesPage() {
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [courses, setCourses] = useState<Course[]>([]);
@@ -99,8 +101,8 @@ export default function CoursesPage() {
         setCourses(data);
       } catch (err) {
         console.error('Error fetching courses:', err);
-        setError(err instanceof Error ? err.message : 'An error occurred while fetching courses');
-        toast.error(err instanceof Error ? err.message : 'Failed to fetch courses');
+        setError(err instanceof Error ? err.message : t('courses.fetchError'));
+        toast.error(err instanceof Error ? err.message : t('courses.fetchError'));
       } finally {
         setIsLoading(false);
       }
@@ -115,7 +117,7 @@ export default function CoursesPage() {
 
   const handleEnroll = async (courseId: string) => {
     if (!session?.user) {
-      toast.error('Please sign in to enroll in courses');
+      toast.error(t('courses.signInError'));
       return;
     }
 
@@ -132,7 +134,7 @@ export default function CoursesPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.message || 'Failed to enroll in course');
+        throw new Error(errorData?.message || t('courses.errorEnroll'));
       }
 
       // Update local state to reflect enrollment immediately
@@ -149,10 +151,10 @@ export default function CoursesPage() {
           : course
       ));
 
-      toast.success('Successfully enrolled in course');
+      toast.success(t('courses.successEnroll'));
     } catch (err) {
       console.error('Enrollment error:', err);
-      toast.error(err instanceof Error ? err.message : 'Failed to enroll in course');
+      toast.error(err instanceof Error ? err.message : t('courses.errorEnroll'));
     } finally {
       setEnrollingCourseId(null);
     }
@@ -171,11 +173,10 @@ export default function CoursesPage() {
           className="text-center space-y-4"
         >
           <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent">
-            Explore Courses
+            {t('courses.title')}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-            Discover a wide range of courses taught by expert instructors.
-            Enhance your knowledge and skills with our comprehensive learning materials.
+            {t('courses.subtitle')}
           </p>
         </motion.div>
 
@@ -189,7 +190,7 @@ export default function CoursesPage() {
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl border border-gray-200/50 dark:border-gray-700/50 p-4">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <Filter className="w-4 h-4" />
-                Categories
+                {t('courses.categories')}
               </h3>
               <ScrollArea className="h-[300px] pr-4">
                 <div className="space-y-1">
@@ -206,7 +207,7 @@ export default function CoursesPage() {
                           : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                       )}
                     >
-                      {category}
+                      {t(`category.${category.replace(/\s+/g, '')}`)}
                     </motion.button>
                   ))}
                 </div>
@@ -222,8 +223,8 @@ export default function CoursesPage() {
             >
               <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
-                label="Search courses"
-                placeholder="Search courses..."
+                label={t('courses.searchLabel')}
+                placeholder={t('courses.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md"
@@ -250,7 +251,7 @@ export default function CoursesPage() {
                   className="text-center py-12"
                 >
                   <div className="w-12 h-12 border-4 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400">Loading courses...</p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('courses.loading')}</p>
                 </motion.div>
               ) : courses.length === 0 ? (
                 <motion.div
@@ -274,12 +275,12 @@ export default function CoursesPage() {
                     <BookOpen className="w-16 h-16 mb-4 text-pink-600 dark:text-pink-400 mx-auto" />
                   </motion.div>
                   <h3 className="text-xl font-semibold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                    No courses found
+                    {t('courses.noCourses')}
                   </h3>
                   <p className="text-gray-500 dark:text-gray-400">
                     {searchQuery
-                      ? "We couldn't find any courses matching your search"
-                      : "No courses are available in this category yet"}
+                      ? t('courses.noMatching')
+                      : t('courses.emptyCategory')}
                   </p>
                 </motion.div>
               ) : (
@@ -317,11 +318,11 @@ export default function CoursesPage() {
                             <div className="flex items-center gap-2 text-white/80 text-sm">
                               <div className="flex items-center gap-1">
                                 <Users className="w-4 h-4" />
-                                {course._count.enrollments} students
+                                {course._count.enrollments} {t('courses.students')}
                               </div>
                               <div className="flex items-center gap-1">
                                 <BookOpen className="w-4 h-4" />
-                                {course._count.lessons} lessons
+                                {course._count.lessons} {t('courses.lessons')}
                               </div>
                             </div>
                           </div>
@@ -371,16 +372,16 @@ export default function CoursesPage() {
                               {enrollingCourseId === course.id ? (
                                 <>
                                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                                  Enrolling...
+                                  {t('courses.enrolling')}
                                 </>
                               ) : course.isEnrolled ? (
                                 <>
-                                  Enrolled
+                                  {t('courses.enrolled')}
                                   <Check className="w-4 h-4 ml-2" />
                                 </>
                               ) : (
                                 <>
-                                  Enroll Now
+                                  {t('courses.enrollNow')}
                                   <ChevronRight className="w-4 h-4 ml-2" />
                                 </>
                               )}

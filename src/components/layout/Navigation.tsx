@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
 import { useTheme } from '@/components/ThemeProvider';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   LayoutDashboard,
   Calendar,
@@ -51,44 +52,45 @@ interface MenuItem {
 
 // Main navigation items
 const mainMenuItems: MenuItem[] = [
-  { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { name: 'AI Learning Hub', icon: Brain, path: '/dashboard/learning-hub', hiddenForRoles: ['teacher'] },
-  { name: 'Find a PhD Tutor', icon: GraduationCap, path: '/dashboard/find-tutor', hiddenForRoles: ['teacher'] },
-  { name: 'AI Chat Tutor', icon: Sparkles, path: '/dashboard/ai-chat' },
-  { name: 'Calendar', icon: Calendar, path: '/dashboard/schedule', badge: 2 },
-  { name: 'Messages', icon: MessageSquare, path: '/dashboard/messages', badge: 5 },
-  { name: 'Courses', icon: BookOpen, path: '/dashboard/courses', hiddenForRoles: ['teacher'] },
+  { name: 'nav.dashboard', icon: LayoutDashboard, path: '/dashboard' },
+  { name: 'nav.aiLearningHub', icon: Brain, path: '/dashboard/learning-hub', hiddenForRoles: ['teacher'] },
+  { name: 'nav.findPhDTutor', icon: GraduationCap, path: '/dashboard/find-tutor', hiddenForRoles: ['teacher'] },
+  { name: 'nav.aiChatTutor', icon: Sparkles, path: '/dashboard/ai-chat' },
+  { name: 'nav.calendar', icon: Calendar, path: '/dashboard/schedule', badge: 2 },
+  { name: 'nav.messages', icon: MessageSquare, path: '/dashboard/messages', badge: 5 },
+  { name: 'nav.courses', icon: BookOpen, path: '/dashboard/courses', hiddenForRoles: ['teacher'] },
 ];
 
 // Student-specific menu items
 const studentMenuItems: MenuItem[] = [
-  { name: 'My Modules', icon: BookOpen, path: '/dashboard/student', section: 'Student Dashboard' },
-  { name: 'My Performance', icon: TrendingUp, path: '/dashboard/student#performance' },
-  { name: 'Recommended Tutors', icon: Users, path: '/dashboard/student#tutors' },
+  { name: 'student.myModules', icon: BookOpen, path: '/dashboard/student', section: 'nav.section.student' },
+  { name: 'student.myPerformance', icon: TrendingUp, path: '/dashboard/student#performance' },
+  { name: 'student.recommendedTutors', icon: Users, path: '/dashboard/student#tutors' },
 ];
 
 // Tutor-specific menu items
 const tutorMenuItems: MenuItem[] = [
-  { name: 'My Bookings', icon: Calendar, path: '/dashboard/tutor', section: 'Tutor Dashboard' },
-  { name: 'My Rating', icon: Star, path: '/dashboard/tutor#rating' },
+  { name: 'tutor.myBookings', icon: Calendar, path: '/dashboard/tutor', section: 'nav.section.tutor' },
+  { name: 'tutor.myRating', icon: Star, path: '/dashboard/tutor#rating' },
 ];
 
 // Admin-specific menu items
 const adminMenuItems: MenuItem[] = [
-  { name: 'Students', icon: Users, path: '/dashboard/admin?tab=students', section: 'Admin Dashboard' },
-  { name: 'Tutors', icon: GraduationCap, path: '/dashboard/admin?tab=tutors' },
-  { name: 'Platform Analytics', icon: TrendingUp, path: '/dashboard/admin?tab=analytics' },
-  { name: 'AI Settings', icon: Brain, path: '/dashboard/admin?tab=ai-settings' },
+  { name: 'admin.students', icon: Users, path: '/dashboard/admin?tab=students', section: 'nav.section.admin' },
+  { name: 'admin.tutors', icon: GraduationCap, path: '/dashboard/admin?tab=tutors' },
+  { name: 'admin.platformAnalytics', icon: TrendingUp, path: '/dashboard/admin?tab=analytics' },
+  { name: 'admin.aiSettings', icon: Brain, path: '/dashboard/admin?tab=ai-settings' },
 ];
 
 const settingsItems: MenuItem[] = [
-  { name: 'Settings', icon: Settings, path: '/dashboard/settings', section: 'Other' },
+  { name: 'nav.settings', icon: Settings, path: '/dashboard/settings', section: 'nav.section.other' },
 ];
 
 export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { data: session } = useSession();
+  const { t, dir } = useLanguage();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [canScroll, setCanScroll] = useState(false);
@@ -189,24 +191,26 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
 
       {!isCollapsed && (
         <span className={clsx(
-          "ml-3 font-medium tracking-wide relative z-10 flex-1",
+          dir === 'rtl' ? "mr-3" : "ml-3",
+          "font-medium tracking-wide relative z-10 flex-1",
           "transition-all duration-200 group-hover:translate-x-0.5",
           isActive ? "text-blue-700 dark:text-blue-400" : "text-gray-700 dark:text-gray-300",
           "group-hover:text-blue-700 dark:group-hover:text-blue-400"
         )}>
-          {item.name}
+          {t(item.name)}
         </span>
       )}
 
       {item.comingSoon && !isCollapsed && (
         <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-          Soon
+          {t('common.soon')}
         </span>
       )}
 
       {item.badge && !isCollapsed && !item.comingSoon && (
         <span className={clsx(
-          'ml-auto px-2.5 py-1 rounded-full text-xs font-medium relative z-10',
+          typeof item.badge === 'string' ? "ml-auto" : (dir === 'rtl' ? "mr-auto" : "ml-auto"),
+          'px-2.5 py-1 rounded-full text-xs font-medium relative z-10',
           typeof item.badge === 'number'
             ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
             : 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
@@ -217,7 +221,7 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
 
       {item.badge && isCollapsed && (
         <span className={clsx(
-          'absolute top-2 right-2 z-10',
+          dir === 'rtl' ? 'absolute top-2 left-2 z-10' : 'absolute top-2 right-2 z-10',
           'w-2.5 h-2.5 rounded-full',
           typeof item.badge === 'number'
             ? 'bg-blue-500'
@@ -228,13 +232,13 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
   );
 
   return (
-    <div className="fixed inset-y-0 left-0 z-40 flex">
+    <div className={clsx("fixed inset-y-0 z-40 flex", dir === 'rtl' ? "right-0" : "left-0")}>
       {/* Sidebar */}
       <aside
         className={clsx(
           'h-screen transition-all duration-300 flex-shrink-0',
           'bg-white dark:bg-gray-900/95 backdrop-blur-sm',
-          'border-r border-gray-100 dark:border-gray-800/50',
+          dir === 'rtl' ? 'border-l border-gray-100 dark:border-gray-800/50' : 'border-r border-gray-100 dark:border-gray-800/50',
           'shadow-sm shadow-gray-100/50 dark:shadow-none',
           isCollapsed ? 'w-[80px]' : 'w-[280px]'
         )}
@@ -283,7 +287,7 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                         "mt-4 mb-3 px-4",
                         "bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent"
                       )}>
-                        {item.section}
+                        {t(item.section as string)}
                       </div>
                     )}
                     <MenuItem item={item} isActive={isActive} />
@@ -356,15 +360,15 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                 )}
               </div>
               {!isCollapsed && (
-                <span className="ml-3 font-medium tracking-wide">
-                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                <span className={clsx("font-medium tracking-wide", dir === 'rtl' ? "mr-3" : "ml-3")}>
+                  {theme === 'light' ? t('common.darkMode') : t('common.lightMode')}
                 </span>
               )}
             </button>
 
             {!isCollapsed && (
               <div className="mt-3 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-pink-50 dark:from-blue-900/20 dark:to-pink-900/20">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-3">
                   <div className={clsx(
                     "w-10 h-10 rounded-lg",
                     "bg-gradient-to-r from-blue-600 to-pink-600",
@@ -375,7 +379,7 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-1">
-                      {session?.user?.name || 'Guest User'}
+                      {session?.user?.name || t('common.guestUser')}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                       {userRole}
@@ -391,8 +395,8 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                     "hover:bg-white dark:hover:bg-gray-800/50 transition-colors"
                   )}
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  <span>Sign out</span>
+                  <LogOut className={clsx("w-4 h-4", dir === 'rtl' ? "ml-2" : "mr-2")} />
+                  <span>{t('common.signOut')}</span>
                 </button>
               </div>
             )}
@@ -402,8 +406,11 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
 
       {/* Header */}
       <div className={clsx(
-        "fixed top-0 right-0 z-30 transition-all duration-300",
-        isCollapsed ? 'left-[80px]' : 'left-[280px]',
+        "fixed top-0 z-30 transition-all duration-300",
+        dir === 'rtl' ? 'left-0' : 'right-0',
+        dir === 'rtl'
+          ? (isCollapsed ? 'right-[80px]' : 'right-[280px]')
+          : (isCollapsed ? 'left-[80px]' : 'left-[280px]'),
       )}>
         <header className={clsx(
           "h-16 border-b border-gray-100 dark:border-gray-800/50",
@@ -411,7 +418,7 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
           "shadow-sm shadow-gray-100/50 dark:shadow-none"
         )}>
           <div className="h-full flex items-center justify-between px-4">
-            <div className="flex items-center space-x-4 flex-1">
+            <div className="flex items-center gap-4 flex-1">
               {/* Collapse Button */}
               <button
                 onClick={() => onCollapse(!isCollapsed)}
@@ -425,7 +432,9 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
               >
                 <ChevronLeft className={clsx(
                   "w-5 h-5 transition-transform duration-200",
-                  isCollapsed && "rotate-180"
+                  dir === 'rtl'
+                    ? (isCollapsed ? "" : "rotate-180")
+                    : (isCollapsed ? "rotate-180" : "")
                 )} />
               </button>
 
@@ -434,14 +443,18 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                 "relative transition-all duration-300",
                 isSearchFocused ? "w-full max-w-2xl" : "w-full max-w-md"
               )}>
-                <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                <Search className={clsx(
+                  "w-5 h-5 absolute top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500",
+                  dir === 'rtl' ? "right-3" : "left-3"
+                )} />
                 <input
                   type="text"
-                  placeholder="Search anything..."
+                  placeholder={t('common.search')}
                   onFocus={() => setIsSearchFocused(true)}
                   onBlur={() => setIsSearchFocused(false)}
                   className={clsx(
-                    "w-full pl-10 pr-4 py-2.5",
+                    "w-full py-2.5",
+                    dir === 'rtl' ? "pr-10 pl-4" : "pl-10 pr-4",
                     "bg-gray-50 dark:bg-gray-800/70",
                     "border border-gray-200 dark:border-gray-700/50",
                     "rounded-xl",
@@ -454,7 +467,7 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-4">
               {/* Notifications */}
               <button className={clsx(
                 "w-10 h-10 flex items-center justify-center rounded-lg relative",
@@ -463,7 +476,8 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
               )}>
                 <Bell className="w-5 h-5" />
                 <span className={clsx(
-                  "absolute top-2 right-2 w-2.5 h-2.5 rounded-full",
+                  dir === 'rtl' ? "absolute top-2 left-2" : "absolute top-2 right-2",
+                  "w-2.5 h-2.5 rounded-full",
                   "bg-gradient-to-r from-pink-500 to-purple-500",
                   "ring-2 ring-white dark:ring-gray-900"
                 )} />
@@ -473,11 +487,11 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-3 focus:outline-none"
+                  className="flex items-center gap-3 focus:outline-none"
                 >
-                  <div className="text-right hidden sm:block">
+                  <div className={clsx("hidden sm:block", dir === 'rtl' ? "text-left" : "text-right")}>
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {session?.user?.name || 'Guest User'}
+                      {session?.user?.name || t('common.guestUser')}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                       {userRole}
@@ -497,7 +511,8 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                 {/* Profile Dropdown */}
                 {isProfileOpen && (
                   <div className={clsx(
-                    "absolute right-0 mt-2 w-56",
+                    "absolute mt-2 w-56",
+                    dir === 'rtl' ? "left-0" : "right-0",
                     "bg-white dark:bg-gray-800",
                     "rounded-xl shadow-lg",
                     "border border-gray-100 dark:border-gray-700/50",
@@ -512,8 +527,8 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                         "hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       )}
                     >
-                      <Settings className="w-4 h-4 mr-3" />
-                      <span>Profile Settings</span>
+                      <Settings className={clsx("w-4 h-4", dir === 'rtl' ? "ml-3" : "mr-3")} />
+                      <span>{t('nav.profileSettings')}</span>
                     </Link>
                     <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-700 to-transparent my-1 mx-3" />
                     <button
@@ -524,8 +539,8 @@ export function Navigation({ isCollapsed, onCollapse }: NavigationProps) {
                         "hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                       )}
                     >
-                      <LogOut className="w-4 h-4 mr-3" />
-                      <span>Sign out</span>
+                      <LogOut className={clsx("w-4 h-4", dir === 'rtl' ? "ml-3" : "mr-3")} />
+                      <span>{t('common.signOut')}</span>
                     </button>
                   </div>
                 )}

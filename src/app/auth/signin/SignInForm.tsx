@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function SignInForm() {
   const [email, setEmail] = useState('');
@@ -20,10 +21,11 @@ export default function SignInForm() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (searchParams.get('registered')) {
-      setSuccess('Registration successful! Please sign in.');
+      setSuccess(t('auth.registrationSuccess'));
     }
     const emailParam = searchParams.get('email');
     if (emailParam) {
@@ -39,13 +41,13 @@ export default function SignInForm() {
 
     // Basic validation
     if (!email.trim()) {
-      setError('Email is required');
+      setError(t('auth.emailRequired'));
       setIsLoading(false);
       return;
     }
 
     if (!password) {
-      setError('Password is required');
+      setError(t('auth.passwordRequired'));
       setIsLoading(false);
       return;
     }
@@ -62,7 +64,7 @@ export default function SignInForm() {
 
       if (result?.error) {
         if (result.error === 'CredentialsSignin') {
-          setError('Invalid email or password. Please try again.');
+          setError(t('auth.invalidCredentials'));
         } else {
           setError(result.error);
         }
@@ -74,9 +76,9 @@ export default function SignInForm() {
     } catch (error) {
       console.error('Sign in error:', error);
       if (error instanceof Error) {
-        setError(`Authentication error: ${error.message}`);
+        setError(`${t('auth.authError')} ${error.message}`);
       } else {
-        setError('An unexpected error occurred during sign in. Please try again later.');
+        setError(t('auth.unexpectedError'));
       }
     } finally {
       setIsLoading(false);
@@ -86,8 +88,8 @@ export default function SignInForm() {
   return (
     <ThemeProvider>
       <AuthCard
-        title="Welcome Back!"
-        subtitle="Sign in to your UniMatch account"
+        title={t('auth.welcomeBack')}
+        subtitle={t('auth.signInSubtitle')}
       >
         <motion.form
           className="space-y-6"
@@ -123,9 +125,9 @@ export default function SignInForm() {
           )}
 
           <Input
-            label="Email Address"
+            label={t('auth.emailLabel')}
             type="email"
-            placeholder="Enter your email"
+            placeholder={t('auth.emailPlaceholder')}
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -134,9 +136,9 @@ export default function SignInForm() {
           />
 
           <Input
-            label="Password"
+            label={t('auth.passwordLabel')}
             type="password"
-            placeholder="Enter your password"
+            placeholder={t('auth.passwordPlaceholder')}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -150,7 +152,7 @@ export default function SignInForm() {
               href="/auth/forgot-password"
               className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors duration-200 hover:underline"
             >
-              Forgot password?
+              {t('auth.forgotPassword')}
             </Link>
           </div>
 
@@ -160,7 +162,7 @@ export default function SignInForm() {
             className="w-full"
             icon={<ArrowRight className="w-4 h-4" />}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? t('auth.signingIn') : t('auth.signIn')}
           </Button>
 
           <div className="relative flex items-center justify-center mt-6">
@@ -168,7 +170,7 @@ export default function SignInForm() {
               <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
             </div>
             <div className="relative px-4 bg-white dark:bg-gray-900 text-sm text-gray-500 dark:text-gray-400">
-              Or continue with
+              {t('auth.orContinueWith')}
             </div>
           </div>
 
@@ -185,17 +187,17 @@ export default function SignInForm() {
                 <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
                 <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
               </svg>
-              <span>Sign in with Google</span>
+              <span>{t('auth.signInGoogle')}</span>
             </Button>
           </div>
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-6">
-            Don&apos;t have an account?{' '}
+            {t('auth.noAccount')}{' '}
             <Link
               href="/auth/register"
               className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors duration-200 hover:underline"
             >
-              Sign up
+              {t('auth.signUp')}
             </Link>
           </p>
         </motion.form>

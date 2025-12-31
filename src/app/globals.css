@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* RTL Support Overrides */
+[dir="rtl"] .me-2 {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
+}
+
+[dir="rtl"] .ms-2 {
+  margin-left: 0 !important;
+  margin-right: 0.5rem !important;
+}
+
+[dir="rtl"] input {
+  text-align: right;
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

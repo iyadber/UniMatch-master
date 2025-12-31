@@ -7,6 +7,7 @@ import { AuthCard } from '@/components/ui/AuthCard';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/button';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -19,6 +20,7 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -35,13 +37,13 @@ export default function RegisterPage() {
 
     // Client-side validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordMismatch'));
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordTooShort'));
       setLoading(false);
       return;
     }
@@ -72,7 +74,7 @@ export default function RegisterPage() {
       router.push(`/auth/signin?registered=true&email=${encodeURIComponent(formData.email.toLowerCase())}`);
     } catch (error) {
       console.error('Registration error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to register');
+      setError(error instanceof Error ? error.message : t('auth.failedToRegister'));
     } finally {
       setLoading(false);
     }
@@ -81,8 +83,8 @@ export default function RegisterPage() {
   return (
     <ThemeProvider>
       <AuthCard
-        title="Create an Account"
-        subtitle="Sign up to join UniMatch"
+        title={t('auth.createAccount')}
+        subtitle={t('auth.joinSubtitle')}
       >
         <form className="space-y-5" onSubmit={handleSubmit}>
           {error && (
@@ -92,9 +94,9 @@ export default function RegisterPage() {
           )}
 
           <Input
-            label="Full Name"
+            label={t('auth.fullnameLabel')}
             name="name"
-            placeholder="Enter your full name"
+            placeholder={t('auth.fullnamePlaceholder')}
             required
             value={formData.name}
             onChange={handleChange}
@@ -102,10 +104,10 @@ export default function RegisterPage() {
           />
 
           <Input
-            label="Email"
+            label={t('auth.emailLabel')}
             name="email"
             type="email"
-            placeholder="Enter your email"
+            placeholder={t('auth.emailPlaceholder')}
             required
             value={formData.email}
             onChange={handleChange}
@@ -113,10 +115,10 @@ export default function RegisterPage() {
           />
 
           <Input
-            label="Password"
+            label={t('auth.passwordLabel')}
             name="password"
             type="password"
-            placeholder="Create a password"
+            placeholder={t('auth.createPasswordPlaceholder')}
             required
             value={formData.password}
             onChange={handleChange}
@@ -124,10 +126,10 @@ export default function RegisterPage() {
           />
 
           <Input
-            label="Confirm Password"
+            label={t('auth.confirmPasswordLabel')}
             name="confirmPassword"
             type="password"
-            placeholder="Confirm your password"
+            placeholder={t('auth.confirmPasswordPlaceholder')}
             required
             value={formData.confirmPassword}
             onChange={handleChange}
@@ -136,7 +138,7 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              I am a:
+              {t('auth.iAmA')}
             </label>
             <div className="grid grid-cols-2 gap-4">
               <label className={`relative block cursor-pointer`}>
@@ -149,8 +151,8 @@ export default function RegisterPage() {
                   onChange={handleChange}
                 />
                 <div className={`p-3 rounded-lg border-2 transition-all ${formData.role === 'student'
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-gray-700'
                   }`}>
                   <div className="flex flex-col items-center">
                     <svg className="w-6 h-6 mb-1 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -158,9 +160,9 @@ export default function RegisterPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v7" />
                     </svg>
                     <span className={`block font-medium ${formData.role === 'student'
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-700 dark:text-gray-300'
-                      }`}>Student</span>
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-gray-700 dark:text-gray-300'
+                      }`}>{t('auth.studentRole')}</span>
                   </div>
                 </div>
               </label>
@@ -175,8 +177,8 @@ export default function RegisterPage() {
                   onChange={handleChange}
                 />
                 <div className={`p-3 rounded-lg border-2 transition-all ${formData.role === 'teacher'
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-gray-200 dark:border-gray-700'
                   }`}>
                   <div className="flex flex-col items-center">
                     <svg className="w-6 h-6 mb-1 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,9 +190,9 @@ export default function RegisterPage() {
                       />
                     </svg>
                     <span className={`block font-medium ${formData.role === 'teacher'
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-700 dark:text-gray-300'
-                      }`}>Teacher</span>
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-gray-700 dark:text-gray-300'
+                      }`}>{t('auth.teacherRole')}</span>
                   </div>
                 </div>
               </label>
@@ -198,16 +200,16 @@ export default function RegisterPage() {
           </div>
 
           <Button type="submit" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
           </Button>
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <Link
               href="/auth/signin"
               className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
             >
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </form>

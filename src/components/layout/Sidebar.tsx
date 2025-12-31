@@ -102,8 +102,8 @@ export function Sidebar({ isCollapsed, onCollapse }: SidebarProps) {
         {/* Navigation Menu with Modern Scrollbar */}
         <nav className={clsx(
           "flex-1",
-          isCollapsed 
-            ? "overflow-hidden" 
+          isCollapsed
+            ? "overflow-hidden"
             : "overflow-y-auto py-3"
         )}>
           <div className={clsx(
@@ -128,7 +128,7 @@ export function Sidebar({ isCollapsed, onCollapse }: SidebarProps) {
                   <div className={clsx(
                     'flex items-center justify-center transition-all duration-200',
                     isCollapsed ? 'w-10 h-10' : 'w-6 h-6',
-                    isActive 
+                    isActive
                       ? 'text-blue-600 dark:text-blue-400'
                       : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-200'
                   )}>
@@ -189,7 +189,7 @@ export function Sidebar({ isCollapsed, onCollapse }: SidebarProps) {
                     <div className={clsx(
                       'flex items-center justify-center transition-all duration-200',
                       'w-6 h-6',
-                      isActive 
+                      isActive
                         ? 'text-blue-600 dark:text-blue-400'
                         : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-gray-200'
                     )}>

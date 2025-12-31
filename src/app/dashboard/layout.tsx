@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Navigation } from '@/components/layout/Navigation';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { LanguageProvider } from '@/contexts/LanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Inter } from 'next/font/google';
 import clsx from 'clsx';
 
@@ -18,6 +18,8 @@ export default function DashboardLayout({
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { status } = useSession();
+
+  const { t, dir } = useLanguage();
 
   // Handle responsive behavior
   useEffect(() => {
@@ -40,36 +42,38 @@ export default function DashboardLayout({
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('common.loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <LanguageProvider>
-      <ThemeProvider>
-        <div className={clsx(
+    <ThemeProvider>
+      <div
+        dir={dir}
+        className={clsx(
           inter.className,
           'min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors'
         )}>
-          <Navigation
-            isCollapsed={isSidebarCollapsed}
-            onCollapse={setIsSidebarCollapsed}
-            isMobile={isMobile}
-          />
+        <Navigation
+          isCollapsed={isSidebarCollapsed}
+          onCollapse={setIsSidebarCollapsed}
+          isMobile={isMobile}
+        />
 
-          {/* Main Content */}
-          <main className={clsx(
-            'pt-16 transition-all duration-300',
-            isSidebarCollapsed ? 'lg:pl-[72px]' : 'lg:pl-[280px]'
-          )}>
-            <div className="px-4 py-6 max-w-7xl mx-auto">
-              {children}
-            </div>
-          </main>
-        </div>
-      </ThemeProvider>
-    </LanguageProvider>
+        {/* Main Content */}
+        <main className={clsx(
+          'pt-16 transition-all duration-300',
+          dir === 'rtl'
+            ? (isSidebarCollapsed ? 'lg:pr-[72px]' : 'lg:pr-[280px]')
+            : (isSidebarCollapsed ? 'lg:pl-[72px]' : 'lg:pl-[280px]')
+        )}>
+          <div className="px-4 py-6 max-w-7xl mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
+    </ThemeProvider>
   );
 } 
