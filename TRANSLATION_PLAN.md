@@ -28,14 +28,14 @@ This document tracks the progress of translating the UniMatch website into all s
 | **Dashboard Navigation** | 🟢 Done | 100% | Sidebar, role-based menu items, profile dropdown. |
 | **Dashboard Sections** | | | |
 | - Admin Area | 🔴 Pending | 0% | |
-| - AI Chat | 🔴 Pending | 0% | |
-| - Career Boost | 🔴 Pending | 0% | |
-| - Courses | � Done | 100% | |
-| - Find Tutor | � Done | 100% | |
+| - AI Chat | 🟢 Done | 100% | |
+| - Career Boost | 🟢 Done | 100% | |
+| - Courses | 🟢 Done | 100% | |
+| - Find Tutor | 🟢 Done | 100% | |
 | - Learning Hub | 🟢 Done | 100% | |
-| - Messages | � Done | 100% | |
-| - Schedule | � Done | 100% | |
-| - Settings | � Done | 100% | |
+| - Messages | 🟢 Done | 100% | |
+| - Schedule | 🟢 Done | 100% | |
+| - Settings | 🟢 Done | 100% | |
 | - Student Area | 🔴 Pending | 0% | |
 | - Tutor Area | 🔴 Pending | 0% | |
 

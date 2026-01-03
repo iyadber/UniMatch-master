@@ -1252,6 +1252,277 @@ export const translations: Translations = {
     'aiBanner.title': { en: 'AI-Powered Matching', ar: 'مطابقة مدعومة بالذكاء الاصطناعي', fr: 'Correspondance par IA' },
     'aiBanner.desc': { en: 'Our AI analyzes your learning style and goals to find the perfect tutor match', ar: 'يحلل الذكاء الاصطناعي أسلوب تعلمك وأهدافك للعثور على المعلم المثالي', fr: 'Notre IA analyse votre style d\'apprentissage et vos objectifs pour trouver le tuteur idéal' },
     'aiBanner.button': { en: 'Get AI Recommendations', ar: 'الحصول على توصيات الذكاء الاصطناعي', fr: 'Obtenir des recommandations IA' },
+
+    // AI Chat
+    'aiChat.title': {
+        en: 'AI Chat Tutor',
+        ar: 'مدرس الدردشة الذكي',
+        fr: 'Tuteur Chat IA',
+    },
+    'aiChat.subtitle': {
+        en: 'Powered by Gemini AI',
+        ar: 'مدعوم بواسطة Gemini AI',
+        fr: 'Propulsé par Gemini AI',
+    },
+    'aiChat.newChat': {
+        en: 'New',
+        ar: 'جديد',
+        fr: 'Nouveau',
+    },
+    'aiChat.quickPrompts': {
+        en: 'Quick Prompts',
+        ar: 'مطالبات سريعة',
+        fr: 'Invites Rapides',
+    },
+    'aiChat.recentChats': {
+        en: 'Recent Chats',
+        ar: 'المحادثات الأخيرة',
+        fr: 'Chats Récents',
+    },
+    'aiChat.noHistory': {
+        en: 'No chat history yet',
+        ar: 'لا يوجد سجل محادثات بعد',
+        fr: 'Pas encore d\'historique',
+    },
+    'aiChat.capabilities': {
+        en: 'AI Capabilities',
+        ar: 'قدرات الذكاء الاصطناعي',
+        fr: 'Capacités IA',
+    },
+    'aiChat.cap.explanations': {
+        en: 'Step-by-step explanations',
+        ar: 'تفسيرات خطوة بخطوة',
+        fr: 'Explications étape par étape',
+    },
+    'aiChat.cap.practice': {
+        en: 'Practice problem generation',
+        ar: 'توليد مسائل للتدريب',
+        fr: 'Génération de problèmes pratiques',
+    },
+    'aiChat.cap.studyPlan': {
+        en: 'Study plan creation',
+        ar: 'إنشاء خطة دراسية',
+        fr: 'Création de plan d\'étude',
+    },
+    'aiChat.cap.visualization': {
+        en: 'Concept visualization',
+        ar: 'تصور المفاهيم',
+        fr: 'Visualisation de concepts',
+    },
+    'aiChat.chat.title': {
+        en: 'AI Study Assistant',
+        ar: 'مساعد الدراسة الذكي',
+        fr: 'Assistant d\'étude IA',
+    },
+    'aiChat.chat.placeholder': {
+        en: "Ask me anything about your studies, homework, or concepts you're learning...",
+        ar: 'اسألني أي شيء عن دراستك أو واجباتك أو المفاهيم التي تتعلمها...',
+        fr: 'Demandez-moi n\'importe quoi sur vos études, vos devoirs ou les concepts que vous apprenez...',
+    },
+    // Suggested Prompts (Titles and Prompts)
+    'aiChat.prompt.explain.title': {
+        en: 'Explain a concept',
+        ar: 'اشرح مفهوماً',
+        fr: 'Expliquer un concept',
+    },
+    'aiChat.prompt.explain.content': {
+        en: 'Can you explain the concept of neural networks in simple terms?',
+        ar: 'هل يمكنك شرح مفهوم الشبكات العصبية بعبارات بسيطة؟',
+        fr: 'Pouvez-vous expliquer le concept des réseaux de neurones en termes simples ?',
+    },
+    'aiChat.prompt.study.title': {
+        en: 'Help me study',
+        ar: 'ساعدني في الدراسة',
+        fr: 'Aidez-moi à étudier',
+    },
+    'aiChat.prompt.study.content': {
+        en: 'Help me create a study plan for my calculus exam next week',
+        ar: 'ساعدني في إنشاء خطة دراسية لافتحان التفاضل والتكامل الأسبوع المقبل',
+        fr: 'Aidez-moi à créer un plan d\'étude pour mon examen de calcul la semaine prochaine',
+    },
+    'aiChat.prompt.solve.title': {
+        en: 'Solve a problem',
+        ar: 'حل مشكلة',
+        fr: 'Résoudre un problème',
+    },
+    'aiChat.prompt.solve.content': {
+        en: 'Walk me through how to solve quadratic equations step by step',
+        ar: 'اشرح لي كيفية حل المعادلات التربيعية خطوة بخطوة',
+        fr: 'Expliquez-moi comment résoudre des équations du second degré étape par étape',
+    },
+    'aiChat.prompt.practice.title': {
+        en: 'Practice questions',
+        ar: 'أسئلة تدريب',
+        fr: 'Questions pratiques',
+    },
+    'aiChat.prompt.practice.content': {
+        en: 'Give me 5 practice questions on linear algebra matrices with solutions',
+        ar: 'أعطني 5 أسئلة تدريبية حول مصفوفات الجبر الخطي مع الحلول',
+        fr: 'Donnez-moi 5 questions pratiques sur les matrices d\'algèbre linéaire avec solutions',
+    },
+
+    // Career Boost
+    'career.title': {
+        en: 'Career Boost',
+        ar: 'تعزيز المسار المهني',
+        fr: 'Boost Carrière',
+    },
+    'career.tag': {
+        en: 'Coming Soon',
+        ar: 'قريباً',
+        fr: 'Bientôt Disponible',
+    },
+    'career.heroDesc': {
+        en: "AI-powered tools to accelerate your career journey. From resume building to interview prep, we've got you covered.",
+        ar: 'أدوات مدعومة بالذكاء الاصطناعي لتسريع رحلتك المهنية. من بناء السيرة الذاتية إلى التحضير للمقابلات، نحن نغطيك.',
+        fr: 'Des outils alimentés par l\'IA pour accélérer votre parcours professionnel. De la création de CV à la préparation d\'entretiens, nous sommes là pour vous.',
+    },
+    'career.getNotified': {
+        en: 'Get Notified',
+        ar: 'احصل على إشعار',
+        fr: 'Être notifié',
+    },
+    'career.learnMore': {
+        en: 'Learn More',
+        ar: 'اعرف المزيد',
+        fr: 'En savoir plus',
+    },
+    'career.stat.ai': {
+        en: 'AI-Powered',
+        ar: 'مدعوم بالذكاء الاصطناعي',
+        fr: 'Propulsé par IA',
+    },
+    'career.stat.aiDesc': {
+        en: 'Personalized recommendations',
+        ar: 'توصيات شخصية',
+        fr: 'Recommandations personnalisées',
+    },
+    'career.stat.time': {
+        en: 'Time Saved',
+        ar: 'الوقت الموفر',
+        fr: 'Temps gagné',
+    },
+    'career.stat.timeDesc': {
+        en: 'Faster job applications',
+        ar: 'طلبات عمل أسرع',
+        fr: 'Candidatures plus rapides',
+    },
+    'career.stat.success': {
+        en: 'Success Rate',
+        ar: 'معدل النجاح',
+        fr: 'Taux de succès',
+    },
+    'career.stat.successDesc': {
+        en: 'Interview success rate',
+        ar: 'معدل نجاح المقابلات',
+        fr: 'Taux de réussite aux entretiens',
+    },
+    'career.features.title': {
+        en: 'Upcoming Features',
+        ar: 'الميزات القادمة',
+        fr: 'Fonctionnalités à venir',
+    },
+    'career.status.inDev': {
+        en: 'In Development',
+        ar: 'قيد التطوير',
+        fr: 'En développement',
+    },
+    'career.status.comingSoon': {
+        en: 'Coming Soon',
+        ar: 'قريباً',
+        fr: 'Bientôt',
+    },
+    'career.status.planned': {
+        en: 'Planned',
+        ar: 'مخطط',
+        fr: 'Prévu',
+    },
+    'career.expected': {
+        en: 'Expected:',
+        ar: 'المتوقع:',
+        fr: 'Prévu :',
+    },
+    'career.newsletter.title': {
+        en: 'Be the first to try Career Boost',
+        ar: 'كن أول من يجرب تعزيز المسار المهني',
+        fr: 'Soyez le premier à essayer Boost Carrière',
+    },
+    'career.newsletter.desc': {
+        en: 'Sign up for early access and exclusive updates on our AI career tools',
+        ar: 'سجل للحصول على وصول مبكر وتحديثات حصرية حول أدوات الذكاء الاصطناعي المهنية لدينا',
+        fr: 'Inscrivez-vous pour un accès anticipé et des mises à jour exclusives sur nos outils de carrière IA',
+    },
+    'career.newsletter.placeholder': {
+        en: 'Enter your email',
+        ar: 'أدخل بريدك الإلكتروني',
+        fr: 'Entrez votre e-mail',
+    },
+    'career.notifyMe': {
+        en: 'Notify Me',
+        ar: 'أعلمني',
+        fr: 'Avertissez-moi',
+    },
+    // Features List
+    'career.feat.resume.title': {
+        en: 'AI Resume Builder',
+        ar: 'باني السيرة الذاتية بالذكاء الاصطناعي',
+        fr: 'Générateur de CV IA',
+    },
+    'career.feat.resume.desc': {
+        en: 'Create ATS-optimized resumes tailored to your dream jobs with AI assistance',
+        ar: 'أنشئ سير ذاتية محسنة لأنظمة تتبع المتقدمين ومصممة خصيصاً لوظائف أحلامك بمساعدة الذكاء الاصطناعي',
+        fr: 'Créez des CV optimisés pour les ATS adaptés à vos emplois de rêve avec l\'aide de l\'IA',
+    },
+    'career.feat.path.title': {
+        en: 'Career Path Planner',
+        ar: 'مخطط المسار المهني',
+        fr: 'Planificateur de carrière',
+    },
+    'career.feat.path.desc': {
+        en: 'AI-powered career roadmaps based on your skills, interests, and market trends',
+        ar: 'خرائط طريق مهنية مدعومة بالذكاء الاصطناعي بناءً على مهاراتك واهتماماتك واتجاهات السوق',
+        fr: 'Feuilles de route de carrière alimentées par l\'IA basées sur vos compétences, intérêts et tendances du marché',
+    },
+    'career.feat.match.title': {
+        en: 'Job Matching Engine',
+        ar: 'محرك مطابقة الوظائف',
+        fr: 'Moteur de correspondance d\'emploi',
+    },
+    'career.feat.match.desc': {
+        en: 'Smart job recommendations matching your profile with opportunities',
+        ar: 'توصيات وظيفية ذكية تطابق ملفك الشخصي مع الفرص',
+        fr: 'Recommandations d\'emploi intelligentes correspondant à votre profil avec des opportunités',
+    },
+    'career.feat.interview.title': {
+        en: 'Interview Prep AI',
+        ar: 'التحضير للمقابلات بالذكاء الاصطناعي',
+        fr: 'Préparation entretien IA',
+    },
+    'career.feat.interview.desc': {
+        en: 'Practice interviews with AI, get feedback, and improve your responses',
+        ar: 'تدرب على المقابلات مع الذكاء الاصطناعي، واحصل على ملاحظات، وحسن إجاباتك',
+        fr: 'Entraînez-vous aux entretiens avec l\'IA, obtenez des retours et améliorez vos réponses',
+    },
+    'career.feat.skills.title': {
+        en: 'Skills Gap Analysis',
+        ar: 'تحليل الفجوة في المهارات',
+        fr: 'Analyse des écarts de compétences',
+    },
+    'career.feat.skills.desc': {
+        en: 'Identify missing skills and get personalized learning recommendations',
+        ar: 'تحديد المهارات المفقودة والحصول على توصيات تعليمية مخصصة',
+        fr: 'Identifiez les compétences manquantes et obtenez des recommandations d\'apprentissage personnalisées',
+    },
+    'career.feat.portfolio.title': {
+        en: 'Portfolio Showcase',
+        ar: 'عرض المحفظة',
+        fr: 'Vitrine de portfolio',
+    },
+    'career.feat.portfolio.desc': {
+        en: 'Build and share your professional portfolio with verified credentials',
+        ar: 'بناء ومشاركة محفظتك المهنية مع المؤهلات الموثقة',
+        fr: 'Créez et partagez votre portfolio professionnel avec des informations d\'identification vérifiées',
+    },
 };
 
 interface LanguageContextType {

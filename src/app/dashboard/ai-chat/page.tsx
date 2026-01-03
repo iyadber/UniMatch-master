@@ -17,34 +17,9 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-// Suggested prompts
-const suggestedPrompts = [
-    {
-        icon: BookOpen,
-        title: 'Explain a concept',
-        prompt: 'Can you explain the concept of neural networks in simple terms?',
-        color: 'from-blue-500 to-cyan-500',
-    },
-    {
-        icon: Brain,
-        title: 'Help me study',
-        prompt: 'Help me create a study plan for my calculus exam next week',
-        color: 'from-purple-500 to-pink-500',
-    },
-    {
-        icon: Lightbulb,
-        title: 'Solve a problem',
-        prompt: 'Walk me through how to solve quadratic equations step by step',
-        color: 'from-orange-500 to-yellow-500',
-    },
-    {
-        icon: Star,
-        title: 'Practice questions',
-        prompt: 'Give me 5 practice questions on linear algebra matrices with solutions',
-        color: 'from-green-500 to-teal-500',
-    },
-];
+
 
 // Chat session type
 interface ChatSession {
@@ -56,6 +31,34 @@ interface ChatSession {
 }
 
 export default function AIChatPage() {
+    const { t } = useLanguage();
+
+    const suggestedPrompts = [
+        {
+            icon: BookOpen,
+            title: t('aiChat.prompt.explain.title'),
+            prompt: t('aiChat.prompt.explain.content'),
+            color: 'from-blue-500 to-cyan-500',
+        },
+        {
+            icon: Brain,
+            title: t('aiChat.prompt.study.title'),
+            prompt: t('aiChat.prompt.study.content'),
+            color: 'from-purple-500 to-pink-500',
+        },
+        {
+            icon: Lightbulb,
+            title: t('aiChat.prompt.solve.title'),
+            prompt: t('aiChat.prompt.solve.content'),
+            color: 'from-orange-500 to-yellow-500',
+        },
+        {
+            icon: Star,
+            title: t('aiChat.prompt.practice.title'),
+            prompt: t('aiChat.prompt.practice.content'),
+            color: 'from-green-500 to-teal-500',
+        },
+    ];
     const chatRef = useRef<AIChatHandle>(null);
     const [chatKey, setChatKey] = useState(0); // For resetting chat
     const [chatHistory, setChatHistory] = useState<ChatSession[]>([
@@ -109,15 +112,15 @@ export default function AIChatPage() {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
-                                AI Chat Tutor
+                                {t('aiChat.title')}
                             </h1>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                Powered by Gemini AI
+                                {t('aiChat.subtitle')}
                             </p>
                         </div>
                         <Button onClick={handleNewChat} variant="secondary" className="shrink-0">
                             <Plus className="w-4 h-4 mr-1" />
-                            New
+                            {t('aiChat.newChat')}
                         </Button>
                     </div>
 
@@ -125,7 +128,7 @@ export default function AIChatPage() {
                     <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 shrink-0">
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                             <Sparkles className="w-4 h-4 text-blue-500" />
-                            Quick Prompts
+                            {t('aiChat.quickPrompts')}
                         </h3>
                         <div className="space-y-2">
                             {suggestedPrompts.map((prompt, index) => (
@@ -160,13 +163,13 @@ export default function AIChatPage() {
                     <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 flex-1 overflow-hidden flex flex-col">
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 shrink-0">
                             <History className="w-4 h-4 text-gray-500" />
-                            Recent Chats
+                            {t('aiChat.recentChats')}
                         </h3>
                         <div className="space-y-2 overflow-y-auto flex-1">
                             {chatHistory.length === 0 ? (
                                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                                     <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                                    <p className="text-sm">No chat history yet</p>
+                                    <p className="text-sm">{t('aiChat.noHistory')}</p>
                                 </div>
                             ) : (
                                 chatHistory.map((chat) => (
@@ -201,24 +204,24 @@ export default function AIChatPage() {
                     {/* Features */}
                     <Card className="p-4 bg-gradient-to-br from-blue-50 to-pink-50 dark:from-blue-900/20 dark:to-pink-900/20 border-0 shrink-0">
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-                            ✨ AI Capabilities
+                            ✨ {t('aiChat.capabilities')}
                         </h3>
                         <ul className="space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
                             <li className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                Step-by-step explanations
+                                {t('aiChat.cap.explanations')}
                             </li>
                             <li className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-pink-500" />
-                                Practice problem generation
+                                {t('aiChat.cap.practice')}
                             </li>
                             <li className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                                Study plan creation
+                                {t('aiChat.cap.studyPlan')}
                             </li>
                             <li className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                Concept visualization
+                                {t('aiChat.cap.visualization')}
                             </li>
                         </ul>
                     </Card>
@@ -231,8 +234,8 @@ export default function AIChatPage() {
                             key={chatKey}
                             ref={chatRef}
                             embedded
-                            title="AI Study Assistant"
-                            placeholder="Ask me anything about your studies, homework, or concepts you're learning..."
+                            title={t('aiChat.chat.title')}
+                            placeholder={t('aiChat.chat.placeholder')}
                         />
                     </Card>
                 </div>
