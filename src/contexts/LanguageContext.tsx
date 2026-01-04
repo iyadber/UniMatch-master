@@ -148,6 +148,567 @@ export const translations: Translations = {
         ar: 'إعدادات الذكاء الاصطناعي',
         fr: 'Paramètres IA',
     },
+    // Admin Dashboard Pages
+    'admin.dashboard.title': {
+        en: 'Admin Dashboard',
+        ar: 'لوحة تحكم المسؤول',
+        fr: 'Tableau de bord Admin',
+    },
+    'admin.dashboard.subtitle': {
+        en: 'Manage platform users, analytics, and AI configuration',
+        ar: 'إدارة مستخدمي المنصة والتحليلات وإعدادات الذكاء الاصطناعي',
+        fr: 'Gérer les utilisateurs, l\'analytique et la configuration IA',
+    },
+    'admin.stats.totalStudents': {
+        en: 'Total Students',
+        ar: 'إجمالي الطلاب',
+        fr: 'Total Étudiants',
+    },
+    'admin.stats.activeTutors': {
+        en: 'Active Tutors',
+        ar: 'المعلمون النشطون',
+        fr: 'Tuteurs Actifs',
+    },
+    'admin.stats.totalRevenue': {
+        en: 'Total Revenue',
+        ar: 'إجمالي الإيرادات',
+        fr: 'Revenu Total',
+    },
+    'admin.stats.aiCalls': {
+        en: 'AI API Calls',
+        ar: 'مكالمات API للذكاء الاصطناعي',
+        fr: 'Appels API IA',
+    },
+    'admin.tabs.analytics': {
+        en: 'Platform Analytics',
+        ar: 'تحليلات المنصة',
+        fr: 'Analytique Plateforme',
+    },
+    'admin.tabs.students': {
+        en: 'Students',
+        ar: 'الطلاب',
+        fr: 'Étudiants',
+    },
+    'admin.tabs.tutors': {
+        en: 'Tutors',
+        ar: 'المعلمون',
+        fr: 'Tuteurs',
+    },
+    'admin.tabs.aiSettings': {
+        en: 'AI Settings',
+        ar: 'إعدادات الذكاء الاصطناعي',
+        fr: 'Paramètres IA',
+    },
+    'admin.charts.platformGrowth': {
+        en: 'Platform Growth',
+        ar: 'نمو المنصة',
+        fr: 'Croissance de la Plateforme',
+    },
+    'admin.charts.platformGrowthDesc': {
+        en: 'Users, sessions, and revenue trends',
+        ar: 'اتجاهات المستخدمين والجلسات والإيرادات',
+        fr: 'Tendances utilisateurs, sessions et revenus',
+    },
+    'admin.charts.userDistribution': {
+        en: 'User Distribution',
+        ar: 'توزيع المستخدمين',
+        fr: 'Distribution des Utilisateurs',
+    },
+    'admin.charts.byUserType': {
+        en: 'By user type',
+        ar: 'حسب نوع المستخدم',
+        fr: 'Par type d\'utilisateur',
+    },
+    'admin.students.title': {
+        en: 'Students Management',
+        ar: 'إدارة الطلاب',
+        fr: 'Gestion des Étudiants',
+    },
+    'admin.students.desc': {
+        en: 'View and manage student accounts',
+        ar: 'عرض وإدارة حسابات الطلاب',
+        fr: 'Voir et gérer les comptes étudiants',
+    },
+    'admin.students.searchPlaceholder': {
+        en: 'Search students...',
+        ar: 'البحث عن الطلاب...',
+        fr: 'Rechercher des étudiants...',
+    },
+    'admin.students.table.student': {
+        en: 'Student',
+        ar: 'الطالب',
+        fr: 'Étudiant',
+    },
+    'admin.students.table.email': {
+        en: 'Email',
+        ar: 'البريد الإلكتروني',
+        fr: 'E-mail',
+    },
+    'admin.students.table.courses': {
+        en: 'Courses',
+        ar: 'الدورات',
+        fr: 'Cours',
+    },
+    'admin.students.table.joined': {
+        en: 'Joined',
+        ar: 'انضم',
+        fr: 'Rejoint',
+    },
+    'admin.students.table.status': {
+        en: 'Status',
+        ar: 'الحالة',
+        fr: 'Statut',
+    },
+    'admin.students.table.actions': {
+        en: 'Actions',
+        ar: 'الإجراءات',
+        fr: 'Actions',
+    },
+    'admin.tutors.title': {
+        en: 'Tutors Management',
+        ar: 'إدارة المعلمين',
+        fr: 'Gestion des Tuteurs',
+    },
+    'admin.tutors.desc': {
+        en: 'Manage tutor accounts and verification',
+        ar: 'إدارة حسابات المعلمين والتحقق',
+        fr: 'Gérer les comptes tuteurs et la vérification',
+    },
+    'admin.tutors.pendingApprovals': {
+        en: 'Pending Approvals',
+        ar: 'موافقات معلقة',
+        fr: 'Approbations en attente',
+    },
+    'admin.tutors.table.tutor': {
+        en: 'Tutor',
+        ar: 'المعلم',
+        fr: 'Tuteur',
+    },
+    'admin.tutors.table.students': {
+        en: 'Students',
+        ar: 'الطلاب',
+        fr: 'Étudiants',
+    },
+    'admin.tutors.table.rating': {
+        en: 'Rating',
+        ar: 'التقييم',
+        fr: 'Évaluation',
+    },
+    'admin.tutors.table.earnings': {
+        en: 'Earnings',
+        ar: 'الأرباح',
+        fr: 'Revenus',
+    },
+    'admin.ai.config.title': {
+        en: 'AI Configuration',
+        ar: 'تكوين الذكاء الاصطناعي',
+        fr: 'Configuration IA',
+    },
+    'admin.ai.config.desc': {
+        en: 'Gemini model settings',
+        ar: 'إعدادات نموذج Gemini',
+        fr: 'Paramètres du modèle Gemini',
+    },
+    'admin.ai.model': {
+        en: 'Model',
+        ar: 'النموذج',
+        fr: 'Modèle',
+    },
+    'admin.ai.temperature': {
+        en: 'Temperature',
+        ar: 'درجة الحرارة',
+        fr: 'Température',
+    },
+    'admin.ai.tempDesc': {
+        en: 'Higher values make output more random',
+        ar: 'القيم الأعلى تجعل المخرجات أكثر عشوائية',
+        fr: 'Des valeurs plus élevées rendent la sortie plus aléatoire',
+    },
+    'admin.ai.maxTokens': {
+        en: 'Max Output Tokens',
+        ar: 'الحد الأقصى لرموز الإخراج',
+        fr: 'Jetons de sortie max',
+    },
+    'admin.ai.features.title': {
+        en: 'AI Features',
+        ar: 'ميزات الذكاء الاصطناعي',
+        fr: 'Fonctionnalités IA',
+    },
+    'admin.ai.features.desc': {
+        en: 'Enable/disable AI features',
+        ar: 'تمكين/تعطيل ميزات الذكاء الاصطناعي',
+        fr: 'Activer/désactiver les fonctionnalités IA',
+    },
+    'admin.ai.features.studyAssistant': {
+        en: 'AI Study Assistant',
+        ar: 'مساعد الدراسة الذكي',
+        fr: 'Assistant d\'étude IA',
+    },
+    'admin.ai.features.studyAssistantDesc': {
+        en: 'Chat-based learning assistance for students',
+        ar: 'مساعدة تعليمية قائمة على الدردشة للطلاب',
+        fr: 'Assistance d\'apprentissage par chat pour les étudiants',
+    },
+    'admin.ai.features.tutorMatching': {
+        en: 'Tutor Matching',
+        ar: 'مطابقة المعلمين',
+        fr: 'Jumelage de tuteurs',
+    },
+    'admin.ai.features.tutorMatchingDesc': {
+        en: 'AI-powered tutor recommendations',
+        ar: 'توصيات المعلمين المدعومة بالذكاء الاصطناعي',
+        fr: 'Recommandations de tuteurs alimentées par l\'IA',
+    },
+    'admin.ai.features.contentModeration': {
+        en: 'Content Moderation',
+        ar: 'إشراف المحتوى',
+        fr: 'Modération de contenu',
+    },
+    'admin.ai.features.contentModerationDesc': {
+        en: 'Automatic content safety checks',
+        ar: 'فحوصات سلامة المحتوى التلقائية',
+        fr: 'Vérifications automatiques de sécurité du contenu',
+    },
+    'admin.ai.usage.title': {
+        en: 'API Usage',
+        ar: 'استخدام API',
+        fr: 'Utilisation API',
+    },
+    'admin.ai.usage.today': {
+        en: 'Today',
+        ar: 'اليوم',
+        fr: 'Aujourd\'hui',
+    },
+    'admin.ai.usage.thisMonth': {
+        en: 'This Month',
+        ar: 'هذا الشهر',
+        fr: 'Ce mois-ci',
+    },
+    'admin.ai.usage.limitUsed': {
+        en: 'of monthly limit used',
+        ar: 'من الحد الشهري المستخدم',
+        fr: 'de la limite mensuelle utilisée',
+    },
+    'admin.ai.usage.calls': {
+        en: 'calls',
+        ar: 'مكالمات',
+        fr: 'appels',
+    },
+
+    // Student Dashboard Pages
+    'student.dashboard.title': {
+        en: 'My Courses',
+        ar: 'دوراتي',
+        fr: 'Mes Cours',
+    },
+    'student.dashboard.subtitle': {
+        en: 'View and continue your enrolled courses',
+        ar: 'عرض ومتابعة دوراتك المسجلة',
+        fr: 'Voir et continuer vos cours inscrits',
+    },
+    'student.stats.enrolled': {
+        en: 'Courses Enrolled',
+        ar: 'الدورات المسجلة',
+        fr: 'Cours Inscrits',
+    },
+    'student.stats.activeCourses': {
+        en: 'Active courses',
+        ar: 'الدورات النشطة',
+        fr: 'Cours actifs',
+    },
+    'student.stats.totalLessons': {
+        en: 'Total Lessons',
+        ar: 'إجمالي الدروس',
+        fr: 'Total Leçons',
+    },
+    'student.stats.availableToWatch': {
+        en: 'Available to watch',
+        ar: 'متاح للمشاهدة',
+        fr: 'Disponible à regarder',
+    },
+    'student.stats.completed': {
+        en: 'Completed',
+        ar: 'مكتمل',
+        fr: 'Terminé',
+    },
+    'student.stats.remaining': {
+        en: 'remaining',
+        ar: 'متبقي',
+        fr: 'restant',
+    },
+    'student.stats.avgProgress': {
+        en: 'Avg. Progress',
+        ar: 'متوسط التقدم',
+        fr: 'Progression Moy.',
+    },
+    'student.stats.overallCompletion': {
+        en: 'Overall completion',
+        ar: 'الإكمال الكلي',
+        fr: 'Achèvement global',
+    },
+    'student.courses.title': {
+        en: 'My Enrolled Courses',
+        ar: 'دوراتي المسجلة',
+        fr: 'Mes Cours Inscrits',
+    },
+    'student.courses.subtitle': {
+        en: 'Continue learning where you left off',
+        ar: 'تابع التعلم من حيث توقفت',
+        fr: 'Continuez d\'apprendre là où vous vous êtes arrêté',
+    },
+    'student.courses.exploreMore': {
+        en: 'Explore More',
+        ar: 'اكتشف المزيد',
+        fr: 'Explorer Plus',
+    },
+    'student.courses.loading': {
+        en: 'Loading your courses...',
+        ar: 'جارٍ تحميل دوراتك...',
+        fr: 'Chargement de vos cours...',
+    },
+    'student.courses.error': {
+        en: 'Failed to load courses',
+        ar: 'فشل تحميل الدورات',
+        fr: 'Échec du chargement des cours',
+    },
+    'student.courses.tryAgain': {
+        en: 'Try Again',
+        ar: 'حاول مرة أخرى',
+        fr: 'Réessayer',
+    },
+    'student.courses.noCourses': {
+        en: 'No courses enrolled yet',
+        ar: 'لا توجد دورات مسجلة بعد',
+        fr: 'Aucun cours inscrit pour le moment',
+    },
+    'student.courses.startLearning': {
+        en: 'Start your learning journey by enrolling in a course',
+        ar: 'ابدأ رحلتك التعليمية بالتسجيل في دورة',
+        fr: 'Commencez votre parcours d\'apprentissage en vous inscrivant à un cours',
+    },
+    'student.courses.browse': {
+        en: 'Browse Courses',
+        ar: 'تصفح الدورات',
+        fr: 'Parcourir les Cours',
+    },
+    'student.courses.watch': {
+        en: 'Watch',
+        ar: 'شاهد',
+        fr: 'Regarder',
+    },
+    'student.courses.lessons': {
+        en: 'lessons',
+        ar: 'دروس',
+        fr: 'leçons',
+    },
+    'student.courses.complete': {
+        en: 'complete',
+        ar: 'مكتمل',
+        fr: 'complet',
+    },
+    'student.ai.placeholder': {
+        en: 'Ask about your courses...',
+        ar: 'اسأل عن دوراتك...',
+        fr: 'Demandez à propos de vos cours...',
+    },
+    'student.performance.title': {
+        en: 'My Performance',
+        ar: 'أدائي',
+        fr: 'Ma Performance',
+    },
+    'student.performance.subtitle': {
+        en: 'Weekly progress overview',
+        ar: 'نظرة عامة على التقدم الأسبوعي',
+        fr: 'Aperçu des progrès hebdomadaires',
+    },
+    'student.focus.title': {
+        en: 'Focus Areas',
+        ar: 'مجالات التركيز',
+        fr: 'Domaines d\'intérêt',
+    },
+    'student.focus.subtitle': {
+        en: 'Time distribution',
+        ar: 'توزيع الوقت',
+        fr: 'Distribution du temps',
+    },
+    'student.tutors.title': {
+        en: 'Recommended Tutors',
+        ar: 'المعلمون الموصى بهم',
+        fr: 'Tuteurs Recommandés',
+    },
+    'student.tutors.subtitle': {
+        en: 'AI-powered suggestions based on your interests',
+        ar: 'اقتراحات مدعومة بالذكاء الاصطناعي بناءً على اهتماماتك',
+        fr: 'Suggestions alimentées par l\'IA basées sur vos intérêts',
+    },
+    'student.tutors.viewAll': {
+        en: 'View All',
+        ar: 'عرض الكل',
+        fr: 'Voir Tout',
+    },
+    'student.tutors.match': {
+        en: 'Match',
+        ar: 'تطابق',
+        fr: 'Correspondance',
+    },
+    'student.tutors.students': {
+        en: 'students',
+        ar: 'طلاب',
+        fr: 'étudiants',
+    },
+
+    // Tutor Dashboard Pages
+    'tutor.dashboard.title': {
+        en: 'Tutor Dashboard',
+        ar: 'لوحة تحكم المعلم',
+        fr: 'Tableau de bord Tuteur',
+    },
+    'tutor.dashboard.subtitle': {
+        en: 'Manage your sessions and monitor student progress',
+        ar: 'إدارة جلساتك ومراقبة تقدم الطلاب',
+        fr: 'Gérez vos sessions et surveillez les progrès des étudiants',
+    },
+    'tutor.stats.activeStudents': {
+        en: 'Active Students',
+        ar: 'الطلاب النشطين',
+        fr: 'Étudiants actifs',
+    },
+    'tutor.stats.totalEnrollments': {
+        en: 'total enrollments',
+        ar: 'إجمالي التسجيلات',
+        fr: 'inscriptions totales',
+    },
+    'tutor.stats.sessionsCompleted': {
+        en: 'Sessions Completed',
+        ar: 'الجلسات المكتملة',
+        fr: 'Sessions terminées',
+    },
+    'tutor.stats.totalSessions': {
+        en: 'total sessions',
+        ar: 'إجمالي الجلسات',
+        fr: 'sessions totales',
+    },
+    'tutor.stats.upcomingSessions': {
+        en: 'Upcoming Sessions',
+        ar: 'الجلسات القادمة',
+        fr: 'Sessions à venir',
+    },
+    'tutor.stats.scheduled': {
+        en: 'scheduled',
+        ar: 'مجدولة',
+        fr: 'prévu',
+    },
+    'tutor.stats.myCourses': {
+        en: 'My Courses',
+        ar: 'دوراتي',
+        fr: 'Mes Cours',
+    },
+    'tutor.stats.activeCourses': {
+        en: 'active courses',
+        ar: 'دورات نشطة',
+        fr: 'cours actifs',
+    },
+    'tutor.bookings.title': {
+        en: 'My Bookings',
+        ar: 'حجوزاتي',
+        fr: 'Mes Réservations',
+    },
+    'tutor.bookings.subtitle': {
+        en: 'Upcoming sessions',
+        ar: 'الجلسات القادمة',
+        fr: 'Sessions à venir',
+    },
+    'tutor.bookings.viewCalendar': {
+        en: 'View Calendar',
+        ar: 'عرض التقويم',
+        fr: 'Voir le calendrier',
+    },
+    'tutor.bookings.noBookings': {
+        en: 'No upcoming sessions',
+        ar: 'لا توجد جلسات قادمة',
+        fr: 'Aucune session à venir',
+    },
+    'tutor.bookings.emptyDesc': {
+        en: 'Your scheduled sessions will appear here',
+        ar: 'ستظهر جلساتك المجدولة هنا',
+        fr: 'Vos sessions programmées apparaîtront ici',
+    },
+    'tutor.bookings.confirmed': {
+        en: 'Confirmed',
+        ar: 'مؤكد',
+        fr: 'Confirmé',
+    },
+    'tutor.bookings.videoCall': {
+        en: 'Video Call',
+        ar: 'مكالمة فيديو',
+        fr: 'Appel Vidéo',
+    },
+    'tutor.courses.title': {
+        en: 'My Courses',
+        ar: 'دوراتي',
+        fr: 'Mes Cours',
+    },
+    'tutor.courses.subtitle': {
+        en: 'Course overview',
+        ar: 'نظرة عامة على الدورة',
+        fr: 'Aperçu du cours',
+    },
+    'tutor.courses.noCourses': {
+        en: 'No courses yet',
+        ar: 'لا توجد دورات حتى الآن',
+        fr: 'Pas encore de cours',
+    },
+    'tutor.courses.create': {
+        en: 'Create Course',
+        ar: 'إنشاء دورة',
+        fr: 'Créer un Cours',
+    },
+    'tutor.courses.student': {
+        en: 'student',
+        ar: 'طالب',
+        fr: 'étudiant',
+    },
+    'tutor.courses.students': {
+        en: 'students',
+        ar: 'طلاب',
+        fr: 'étudiants',
+    },
+    'tutor.courses.viewAll': {
+        en: 'View All',
+        ar: 'عرض الكل',
+        fr: 'Voir Tout',
+    },
+    'tutor.rating.title': {
+        en: 'My Rating',
+        ar: 'تقييمي',
+        fr: 'Mon Évaluation',
+    },
+    'tutor.rating.subtitle': {
+        en: 'Student feedback coming soon',
+        ar: 'تعليقات الطلاب قريبًا',
+        fr: 'Commentaires des étudiants bientôt disponibles',
+    },
+    'tutor.rating.noRatings': {
+        en: 'No ratings yet',
+        ar: 'لا توجد تقييمات حتى الآن',
+        fr: 'Pas encore d\'évaluations',
+    },
+    'tutor.loading': {
+        en: 'Loading dashboard...',
+        ar: 'جارٍ تحميل لوحة القيادة...',
+        fr: 'Chargement du tableau de bord...',
+    },
+    'tutor.error': {
+        en: 'Failed to load tutor data',
+        ar: 'فشل تحميل بيانات المعلم',
+        fr: 'Échec du chargement des données du tuteur',
+    },
+    'tutor.tryAgain': {
+        en: 'Try Again',
+        ar: 'حاول مرة أخرى',
+        fr: 'Réessayer',
+    },
+
     // Common
     'common.signOut': {
         en: 'Sign out',

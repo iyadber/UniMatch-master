@@ -38,6 +38,7 @@ import {
     Bar
 } from 'recharts';
 import clsx from 'clsx';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock platform analytics
 const platformData = [
@@ -104,14 +105,15 @@ const item = {
 type TabType = 'students' | 'tutors' | 'analytics' | 'ai-settings';
 
 export default function AdminDashboard() {
+    const { t, language } = useLanguage();
     const [activeTab, setActiveTab] = useState<TabType>('analytics');
     const [searchQuery, setSearchQuery] = useState('');
 
     const tabs = [
-        { id: 'analytics' as TabType, label: 'Platform Analytics', icon: TrendingUp },
-        { id: 'students' as TabType, label: 'Students', icon: Users },
-        { id: 'tutors' as TabType, label: 'Tutors', icon: GraduationCap },
-        { id: 'ai-settings' as TabType, label: 'AI Settings', icon: Brain },
+        { id: 'analytics' as TabType, label: t('admin.tabs.analytics'), icon: TrendingUp },
+        { id: 'students' as TabType, label: t('admin.tabs.students'), icon: Users },
+        { id: 'tutors' as TabType, label: t('admin.tabs.tutors'), icon: GraduationCap },
+        { id: 'ai-settings' as TabType, label: t('admin.tabs.aiSettings'), icon: Brain },
     ];
 
     return (
@@ -127,10 +129,10 @@ export default function AdminDashboard() {
                 transition={{ duration: 0.5 }}
             >
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
-                    Admin Dashboard
+                    {t('admin.dashboard.title')}
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">
-                    Manage platform users, analytics, and AI configuration
+                    {t('admin.dashboard.subtitle')}
                 </p>
             </motion.div>
 
@@ -142,10 +144,10 @@ export default function AdminDashboard() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
             >
                 {[
-                    { label: 'Total Students', value: '2,400', icon: Users, change: '+124 this month', color: 'blue' },
-                    { label: 'Active Tutors', value: '180', icon: GraduationCap, change: '+12 verified', color: 'pink' },
-                    { label: 'Total Revenue', value: '$89,000', icon: DollarSign, change: '+18% growth', color: 'green' },
-                    { label: 'AI API Calls', value: '34.5K', icon: Brain, change: 'This month', color: 'purple' },
+                    { label: t('admin.stats.totalStudents'), value: '2,400', icon: Users, change: '+124 this month', color: 'blue' },
+                    { label: t('admin.stats.activeTutors'), value: '180', icon: GraduationCap, change: '+12 verified', color: 'pink' },
+                    { label: t('admin.stats.totalRevenue'), value: '$89,000', icon: DollarSign, change: '+18% growth', color: 'green' },
+                    { label: t('admin.stats.aiCalls'), value: '34.5K', icon: Brain, change: 'This month', color: 'purple' },
                 ].map((stat, index) => (
                     <motion.div key={index} variants={item}>
                         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-shadow">
@@ -206,8 +208,8 @@ export default function AdminDashboard() {
                                     <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Platform Growth</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Users, sessions, and revenue trends</p>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('admin.charts.platformGrowth')}</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.charts.platformGrowthDesc')}</p>
                                 </div>
                             </div>
 
@@ -249,8 +251,8 @@ export default function AdminDashboard() {
                                     <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">User Distribution</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">By user type</p>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('admin.charts.userDistribution')}</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.charts.byUserType')}</p>
                                 </div>
                             </div>
 
@@ -310,8 +312,8 @@ export default function AdminDashboard() {
                                     <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Students Management</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">View and manage student accounts</p>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('admin.students.title')}</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.students.desc')}</p>
                                 </div>
                             </div>
                             <div className="flex gap-2">
@@ -319,7 +321,7 @@ export default function AdminDashboard() {
                                     <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                     <input
                                         type="text"
-                                        placeholder="Search students..."
+                                        placeholder={t('admin.students.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -336,12 +338,12 @@ export default function AdminDashboard() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-gray-200 dark:border-gray-700">
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Student</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Email</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Courses</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Joined</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.student')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.email')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.courses')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.joined')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.status')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -402,13 +404,13 @@ export default function AdminDashboard() {
                                     <GraduationCap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Tutors Management</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Manage tutor accounts and verification</p>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('admin.tutors.title')}</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.tutors.desc')}</p>
                                 </div>
                             </div>
                             <Button>
                                 <UserCheck className="w-4 h-4 mr-2" />
-                                Pending Approvals (3)
+                                {t('admin.tutors.pendingApprovals')} (3)
                             </Button>
                         </div>
 
@@ -416,13 +418,13 @@ export default function AdminDashboard() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-gray-200 dark:border-gray-700">
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Tutor</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Email</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Students</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Rating</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Earnings</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Actions</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.tutors.table.tutor')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.email')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.tutors.table.students')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.tutors.table.rating')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.tutors.table.earnings')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.status')}</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.students.table.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -490,14 +492,14 @@ export default function AdminDashboard() {
                                 <Brain className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                             </div>
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Configuration</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Gemini model settings</p>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('admin.ai.config.title')}</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.ai.config.desc')}</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Model</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.ai.model')}</label>
                                 <select className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
                                     <option value="gemini-flash-latest">gemini-flash-latest</option>
                                     <option value="gemini-pro">gemini-pro</option>
@@ -507,7 +509,7 @@ export default function AdminDashboard() {
 
                             <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50">
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Temperature: {aiSettings.temperature}
+                                    {t('admin.ai.temperature')}: {aiSettings.temperature}
                                 </label>
                                 <input
                                     type="range"
@@ -517,11 +519,11 @@ export default function AdminDashboard() {
                                     defaultValue={aiSettings.temperature}
                                     className="w-full accent-blue-600"
                                 />
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Higher values make output more random</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('admin.ai.tempDesc')}</p>
                             </div>
 
                             <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Output Tokens</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.ai.maxTokens')}</label>
                                 <input
                                     type="number"
                                     defaultValue={aiSettings.maxTokens}
@@ -538,16 +540,16 @@ export default function AdminDashboard() {
                                 <Settings className="w-5 h-5 text-green-600 dark:text-green-400" />
                             </div>
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Features</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Enable/disable AI features</p>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('admin.ai.features.title')}</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.ai.features.desc')}</p>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             {[
-                                { name: 'AI Study Assistant', description: 'Chat-based learning assistance for students', enabled: aiSettings.studyAssistantEnabled },
-                                { name: 'Tutor Matching', description: 'AI-powered tutor recommendations', enabled: aiSettings.tutorMatchingEnabled },
-                                { name: 'Content Moderation', description: 'Automatic content safety checks', enabled: aiSettings.contentModerationEnabled },
+                                { name: t('admin.ai.features.studyAssistant'), description: t('admin.ai.features.studyAssistantDesc'), enabled: aiSettings.studyAssistantEnabled },
+                                { name: t('admin.ai.features.tutorMatching'), description: t('admin.ai.features.tutorMatchingDesc'), enabled: aiSettings.tutorMatchingEnabled },
+                                { name: t('admin.ai.features.contentModeration'), description: t('admin.ai.features.contentModerationDesc'), enabled: aiSettings.contentModerationEnabled },
                             ].map((feature, index) => (
                                 <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50">
                                     <div>
@@ -564,15 +566,15 @@ export default function AdminDashboard() {
 
                         {/* API Usage */}
                         <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-pink-50 dark:from-blue-900/20 dark:to-pink-900/20">
-                            <h3 className="font-medium text-gray-900 dark:text-white mb-3">API Usage</h3>
+                            <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('admin.ai.usage.title')}</h3>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">Today</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{aiSettings.apiUsage.today.toLocaleString()} calls</span>
+                                    <span className="text-gray-600 dark:text-gray-400">{t('admin.ai.usage.today')}</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{aiSettings.apiUsage.today.toLocaleString()} {t('admin.ai.usage.calls')}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600 dark:text-gray-400">This Month</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{aiSettings.apiUsage.thisMonth.toLocaleString()} calls</span>
+                                    <span className="text-gray-600 dark:text-gray-400">{t('admin.ai.usage.thisMonth')}</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{aiSettings.apiUsage.thisMonth.toLocaleString()} {t('admin.ai.usage.calls')}</span>
                                 </div>
                                 <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mt-2">
                                     <div
@@ -581,7 +583,7 @@ export default function AdminDashboard() {
                                     />
                                 </div>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {((aiSettings.apiUsage.thisMonth / aiSettings.apiUsage.limit) * 100).toFixed(1)}% of monthly limit used
+                                    {((aiSettings.apiUsage.thisMonth / aiSettings.apiUsage.limit) * 100).toFixed(1)}% {t('admin.ai.usage.limitUsed')}
                                 </p>
                             </div>
                         </div>

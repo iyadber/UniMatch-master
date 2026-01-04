@@ -35,6 +35,7 @@ import {
 import { toast } from 'sonner';
 import Image from 'next/image';
 import clsx from 'clsx';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Types for enrolled courses
 interface EnrolledCourse {
@@ -127,6 +128,7 @@ const item = {
 };
 
 export default function StudentDashboard() {
+    const { t } = useLanguage();
     const { data: session } = useSession();
     const router = useRouter();
     const [enrolledCourses, setEnrolledCourses] = useState<EnrolledCourse[]>([]);
@@ -151,8 +153,8 @@ export default function StudentDashboard() {
                 setEnrolledCourses(data);
             } catch (err) {
                 console.error('Error fetching enrolled courses:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load courses');
-                toast.error('Failed to load your courses');
+                setError(err instanceof Error ? err.message : t('student.courses.error'));
+                toast.error(t('student.courses.error'));
             } finally {
                 setIsLoading(false);
             }
@@ -194,10 +196,10 @@ export default function StudentDashboard() {
                 transition={{ duration: 0.5 }}
             >
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
-                    My Courses
+                    {t('student.dashboard.title')}
                 </h1>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">
-                    View and continue your enrolled courses
+                    {t('student.dashboard.subtitle')}
                 </p>
             </motion.div>
 
@@ -209,10 +211,10 @@ export default function StudentDashboard() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
             >
                 {[
-                    { label: 'Courses Enrolled', value: stats.coursesEnrolled.toString(), icon: BookOpen, change: 'Active courses' },
-                    { label: 'Total Lessons', value: stats.totalLessons.toString(), icon: GraduationCap, change: 'Available to watch' },
-                    { label: 'Completed', value: stats.completedLessons.toString(), icon: CheckCircle, change: `${stats.totalLessons - stats.completedLessons} remaining` },
-                    { label: 'Avg. Progress', value: `${stats.avgProgress}%`, icon: TrendingUp, change: 'Overall completion' },
+                    { label: t('student.stats.enrolled'), value: stats.coursesEnrolled.toString(), icon: BookOpen, change: t('student.stats.activeCourses') },
+                    { label: t('student.stats.totalLessons'), value: stats.totalLessons.toString(), icon: GraduationCap, change: t('student.stats.availableToWatch') },
+                    { label: t('student.stats.completed'), value: stats.completedLessons.toString(), icon: CheckCircle, change: `${stats.totalLessons - stats.completedLessons} ${t('student.stats.remaining')}` },
+                    { label: t('student.stats.avgProgress'), value: `${stats.avgProgress}%`, icon: TrendingUp, change: t('student.stats.overallCompletion') },
                 ].map((stat, index) => (
                     <motion.div key={index} variants={item}>
                         <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 hover:shadow-lg transition-shadow">
@@ -248,8 +250,8 @@ export default function StudentDashboard() {
                                     <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Enrolled Courses</h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Continue learning where you left off</p>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('student.courses.title')}</h2>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('student.courses.subtitle')}</p>
                                 </div>
                             </div>
                             <Button
@@ -258,7 +260,7 @@ export default function StudentDashboard() {
                                 className="text-sm"
                             >
                                 <ExternalLink className="w-4 h-4 mr-2" />
-                                Explore More
+                                {t('student.courses.exploreMore')}
                             </Button>
                         </div>
 
@@ -266,7 +268,7 @@ export default function StudentDashboard() {
                         {isLoading && (
                             <div className="flex flex-col items-center justify-center py-12">
                                 <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-                                <p className="text-gray-500 dark:text-gray-400">Loading your courses...</p>
+                                <p className="text-gray-500 dark:text-gray-400">{t('student.courses.loading')}</p>
                             </div>
                         )}
 
@@ -274,7 +276,7 @@ export default function StudentDashboard() {
                         {error && !isLoading && (
                             <div className="text-center py-12">
                                 <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
-                                <Button onClick={() => window.location.reload()}>Try Again</Button>
+                                <Button onClick={() => window.location.reload()}>{t('student.courses.tryAgain')}</Button>
                             </div>
                         )}
 
@@ -295,14 +297,14 @@ export default function StudentDashboard() {
                                     <BookOpen className="w-16 h-16 mb-4 text-pink-600 dark:text-pink-400 mx-auto" />
                                 </motion.div>
                                 <h3 className="text-xl font-semibold bg-gradient-to-r from-pink-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                                    No courses enrolled yet
+                                    {t('student.courses.noCourses')}
                                 </h3>
                                 <p className="text-gray-500 dark:text-gray-400 mb-6">
-                                    Start your learning journey by enrolling in a course
+                                    {t('student.courses.startLearning')}
                                 </p>
                                 <Button onClick={handleExploreCourses}>
                                     <BookOpen className="w-4 h-4 mr-2" />
-                                    Browse Courses
+                                    {t('student.courses.browse')}
                                 </Button>
                             </div>
                         )}
@@ -359,7 +361,7 @@ export default function StudentDashboard() {
                                                             }}
                                                         >
                                                             <Play className="w-4 h-4 mr-1" />
-                                                            Watch
+                                                            {t('student.courses.watch')}
                                                         </Button>
                                                     </div>
 
@@ -370,7 +372,7 @@ export default function StudentDashboard() {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <BookOpen className="w-3 h-3" />
-                                                            {course._count.lessons} lessons
+                                                            {course._count.lessons} {t('student.courses.lessons')}
                                                         </span>
                                                         <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs">
                                                             {course.category}
@@ -390,7 +392,7 @@ export default function StudentDashboard() {
                                                         />
                                                     </div>
                                                     <p className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                        {course.completedLessons}/{course._count.lessons} lessons • {course.progress}% complete
+                                                        {course.completedLessons}/{course._count.lessons} {t('student.courses.lessons')} • {course.progress}% {t('student.courses.complete')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -411,8 +413,8 @@ export default function StudentDashboard() {
                     <Card className="p-0 h-[500px] bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
                         <AIChat
                             embedded
-                            title="AI Study Assistant"
-                            placeholder="Ask about your courses..."
+                            title={t('student.aiStudyAssistant')}
+                            placeholder={t('student.ai.placeholder')}
                         />
                     </Card>
                 </motion.div>
@@ -432,8 +434,8 @@ export default function StudentDashboard() {
                             <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Performance</h2>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Weekly progress overview</p>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('student.performance.title')}</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('student.performance.subtitle')}</p>
                         </div>
                     </div>
 
@@ -489,8 +491,8 @@ export default function StudentDashboard() {
                             <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Focus Areas</h2>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Time distribution</p>
+                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('student.focus.title')}</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{t('student.focus.subtitle')}</p>
                         </div>
                     </div>
 
@@ -550,12 +552,12 @@ export default function StudentDashboard() {
                                 <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recommended Tutors</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">AI-powered suggestions based on your interests</p>
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('student.tutors.title')}</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t('student.tutors.subtitle')}</p>
                             </div>
                         </div>
                         <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                            View All
+                            {t('student.tutors.viewAll')}
                         </button>
                     </div>
 
@@ -570,7 +572,7 @@ export default function StudentDashboard() {
                                         {tutor.name.split(' ').map(n => n[0]).join('')}
                                     </div>
                                     <div className="px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-medium">
-                                        {tutor.matchScore}% Match
+                                        {tutor.matchScore}% {t('student.tutors.match')}
                                     </div>
                                 </div>
 
@@ -584,7 +586,7 @@ export default function StudentDashboard() {
                                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                                         <span className="text-sm font-medium text-gray-900 dark:text-white">{tutor.rating}</span>
                                     </div>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">{tutor.students} students</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">{tutor.students} {t('student.tutors.students')}</span>
                                 </div>
                             </div>
                         ))}

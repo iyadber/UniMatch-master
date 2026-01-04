@@ -5,7 +5,7 @@ This document tracks the progress of translating the UniMatch website into all s
 ## Overview
 - **Goal**: Enable full translation support across all pages.
 - **Languages**: English, Arabic, French.
-- **Current Status**: `LanguageContext` exists but is not globally implemented. Most pages have hardcoded text.
+- **Current Status**: `LanguageContext` is globally implemented. All dashboard pages (Admin, Student, Tutor, etc.) have been translated.
 
 ## Implementation Steps
 1.  [x] **Global Setup**: Add `LanguageProvider` to `src/app/layout.tsx`.
@@ -27,7 +27,7 @@ This document tracks the progress of translating the UniMatch website into all s
 | **Dashboard Main** (`/app/dashboard/page.tsx`) | 🟢 Done | 100% | Translated stats, headers, actions. |
 | **Dashboard Navigation** | 🟢 Done | 100% | Sidebar, role-based menu items, profile dropdown. |
 | **Dashboard Sections** | | | |
-| - Admin Area | 🔴 Pending | 0% | |
+| - Admin Area | 🟢 Done | 100% | Translated stats, charts, tables, AI settings. |
 | - AI Chat | 🟢 Done | 100% | |
 | - Career Boost | 🟢 Done | 100% | |
 | - Courses | 🟢 Done | 100% | |
@@ -36,8 +36,8 @@ This document tracks the progress of translating the UniMatch website into all s
 | - Messages | 🟢 Done | 100% | |
 | - Schedule | 🟢 Done | 100% | |
 | - Settings | 🟢 Done | 100% | |
-| - Student Area | 🔴 Pending | 0% | |
-| - Tutor Area | 🔴 Pending | 0% | |
+| - Student Area | 🟢 Done | 100% | Translated stats, enrolled courses, performance charts. |
+| - Tutor Area | 🟢 Done | 100% | Translated stats, sessions, bookings. |
 
 ## Detailed Breakdown
 
