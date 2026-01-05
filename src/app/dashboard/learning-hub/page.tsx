@@ -89,25 +89,25 @@ interface QuizQuestion {
 
 // Subject options with icons
 const subjectOptions = [
-    { id: 'machine-learning', label: 'Machine Learning', icon: Brain },
-    { id: 'data-science', label: 'Data Science', icon: TrendingUp },
-    { id: 'programming', label: 'Programming', icon: Code },
-    { id: 'mathematics', label: 'Mathematics', icon: Calculator },
-    { id: 'languages', label: 'Languages', icon: Globe },
-    { id: 'design', label: 'Design', icon: Palette },
-    { id: 'music', label: 'Music', icon: Music },
-    { id: 'science', label: 'Natural Sciences', icon: Microscope },
-    { id: 'health', label: 'Health & Medicine', icon: Heart },
-    { id: 'business', label: 'Business & Finance', icon: Rocket },
+    { id: 'machine-learning', label: 'learningHub.subjects.machineLearning', icon: Brain },
+    { id: 'data-science', label: 'learningHub.subjects.dataScience', icon: TrendingUp },
+    { id: 'programming', label: 'learningHub.subjects.programming', icon: Code },
+    { id: 'mathematics', label: 'learningHub.subjects.mathematics', icon: Calculator },
+    { id: 'languages', label: 'learningHub.subjects.languages', icon: Globe },
+    { id: 'design', label: 'learningHub.subjects.design', icon: Palette },
+    { id: 'music', label: 'learningHub.subjects.music', icon: Music },
+    { id: 'science', label: 'learningHub.subjects.naturalSciences', icon: Microscope },
+    { id: 'health', label: 'learningHub.subjects.healthMedicine', icon: Heart },
+    { id: 'business', label: 'learningHub.subjects.businessFinance', icon: Rocket },
 ];
 
 const goalOptions = [
-    'Master a new skill',
-    'Advance my career',
-    'Academic excellence',
-    'Personal interest',
-    'Prepare for exams',
-    'Build projects',
+    { id: 'masterSkill', label: 'learningHub.goals.masterSkill' },
+    { id: 'advanceCareer', label: 'learningHub.goals.advanceCareer' },
+    { id: 'academicExcellence', label: 'learningHub.goals.academicExcellence' },
+    { id: 'personalInterest', label: 'learningHub.goals.personalInterest' },
+    { id: 'prepareExams', label: 'learningHub.goals.prepareExams' },
+    { id: 'buildProjects', label: 'learningHub.goals.buildProjects' },
 ];
 
 const learningStyleOptions = [
@@ -117,8 +117,19 @@ const learningStyleOptions = [
     { id: 'mixed', label: 'pref.mixed', desc: 'pref.mixedDesc' },
 ];
 
-const experienceLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
-const weeklyHoursOptions = ['1-3 hours', '4-7 hours', '8-15 hours', '15+ hours'];
+const experienceLevels = [
+    { id: 'Beginner', label: 'learningHub.experience.Beginner' },
+    { id: 'Intermediate', label: 'learningHub.experience.Intermediate' },
+    { id: 'Advanced', label: 'learningHub.experience.Advanced' },
+    { id: 'Expert', label: 'learningHub.experience.Expert' }
+];
+
+const weeklyHoursOptions = [
+    { id: '1-3 hours', label: 'learningHub.hours.1-3' },
+    { id: '4-7 hours', label: 'learningHub.hours.4-7' },
+    { id: '8-15 hours', label: 'learningHub.hours.8-15' },
+    { id: '15+ hours', label: 'learningHub.hours.15+' }
+];
 
 // Default preferences
 const defaultPreferences: UserPreferences = {
@@ -138,7 +149,7 @@ const OnboardingModal = ({
     onComplete: (prefs: UserPreferences) => void;
     initialPreferences: UserPreferences;
 }) => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const [step, setStep] = useState(1);
     const [prefs, setPrefs] = useState<UserPreferences>(initialPreferences);
     const totalSteps = 5;
@@ -291,7 +302,7 @@ const OnboardingModal = ({
                                                     ? 'text-blue-600 dark:text-blue-400'
                                                     : 'text-gray-700 dark:text-gray-300'
                                             )}>
-                                                {subject.label}
+                                                {t(subject.label)}
                                             </span>
                                             {prefs.subjects.includes(subject.id) && (
                                                 <Check className="w-4 h-4 text-blue-600 ml-auto" />
@@ -306,23 +317,23 @@ const OnboardingModal = ({
                                 <div className="grid grid-cols-2 gap-3">
                                     {goalOptions.map((goal) => (
                                         <button
-                                            key={goal}
-                                            onClick={() => toggleGoal(goal)}
+                                            key={goal.id}
+                                            onClick={() => toggleGoal(goal.id)}
                                             className={clsx(
                                                 'p-4 rounded-xl text-left transition-all duration-200',
                                                 'border-2',
-                                                prefs.learningGoals.includes(goal)
+                                                prefs.learningGoals.includes(goal.id)
                                                     ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20'
                                                     : 'border-gray-200 dark:border-gray-700 hover:border-pink-300'
                                             )}
                                         >
                                             <span className={clsx(
                                                 'font-medium',
-                                                prefs.learningGoals.includes(goal)
+                                                prefs.learningGoals.includes(goal.id)
                                                     ? 'text-pink-600 dark:text-pink-400'
                                                     : 'text-gray-700 dark:text-gray-300'
                                             )}>
-                                                {goal}
+                                                {t(goal.label)}
                                             </span>
                                         </button>
                                     ))}
@@ -365,16 +376,16 @@ const OnboardingModal = ({
                                         <div className="flex gap-2">
                                             {experienceLevels.map((level) => (
                                                 <button
-                                                    key={level}
-                                                    onClick={() => setPrefs({ ...prefs, experienceLevel: level })}
+                                                    key={level.id}
+                                                    onClick={() => setPrefs({ ...prefs, experienceLevel: level.id })}
                                                     className={clsx(
                                                         'flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all',
-                                                        prefs.experienceLevel === level
+                                                        prefs.experienceLevel === level.id
                                                             ? 'bg-gradient-to-r from-blue-600 to-pink-600 text-white'
                                                             : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                                                     )}
                                                 >
-                                                    {level}
+                                                    {t(level.label)}
                                                 </button>
                                             ))}
                                         </div>
@@ -386,16 +397,16 @@ const OnboardingModal = ({
                                         <div className="grid grid-cols-2 gap-2">
                                             {weeklyHoursOptions.map((hours) => (
                                                 <button
-                                                    key={hours}
-                                                    onClick={() => setPrefs({ ...prefs, weeklyHours: hours })}
+                                                    key={hours.id}
+                                                    onClick={() => setPrefs({ ...prefs, weeklyHours: hours.id })}
                                                     className={clsx(
                                                         'py-3 px-4 rounded-xl text-sm font-medium transition-all',
-                                                        prefs.weeklyHours === hours
+                                                        prefs.weeklyHours === hours.id
                                                             ? 'bg-gradient-to-r from-green-500 to-teal-500 text-white'
                                                             : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                                                     )}
                                                 >
-                                                    {hours}
+                                                    {t(hours.label)}
                                                 </button>
                                             ))}
                                         </div>
@@ -471,7 +482,7 @@ const AIToolCard = ({
         <button
             onClick={onClick}
             className={clsx(
-                'w-full p-6 rounded-2xl text-left transition-all duration-300',
+                'w-full p-6 rounded-2xl text-start transition-all duration-300',
                 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg',
                 'border-2',
                 isActive
@@ -500,7 +511,7 @@ const AIToolCard = ({
 
 // Flashcard Viewer Component
 const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -511,14 +522,14 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
         setIsGenerating(true);
         try {
             const subjects = preferences.subjects.map(s =>
-                subjectOptions.find(opt => opt.id === s)?.label || s
+                t(subjectOptions.find(opt => opt.id === s)?.label || '') || s
             ).join(', ');
 
             const response = await fetch('/api/ai/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: `Generate ${isInitial ? 5 : 3} flashcards for a ${preferences.experienceLevel} student studying ${subjects}. Focus on ${preferences.learningGoals.join(', ')}. Return ONLY a valid JSON array with format: [{"question": "...", "answer": "...", "topic": "..."}]. No other text.`,
+                    message: `Generate ${isInitial ? 5 : 3} flashcards for a ${preferences.experienceLevel} student studying ${subjects}. Focus on ${preferences.learningGoals.join(', ')}. Return ONLY a valid JSON array with format: [{"question": "...", "answer": "...", "topic": "..."}]. The content MUST be in ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'} language. No other text.`,
                     systemPrompt: 'You are an educational AI. OUTPUT ONLY RAW JSON. NO MARKDOWN. NO BACKTICKS.',
                 }),
             });
@@ -664,7 +675,7 @@ const FlashcardViewer = ({ preferences }: { preferences: UserPreferences }) => {
 
 // Quiz Viewer Component
 const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const [questions, setQuestions] = useState<QuizQuestion[]>([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -677,14 +688,14 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
         setIsGenerating(true);
         try {
             const subjects = preferences.subjects.map(s =>
-                subjectOptions.find(opt => opt.id === s)?.label || s
+                t(subjectOptions.find(opt => opt.id === s)?.label || '') || s
             ).join(', ');
 
             const response = await fetch('/api/ai/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: `Create 5 multiple choice quiz questions for a ${preferences.experienceLevel} student studying ${subjects}. Goals: ${preferences.learningGoals.join(', ')}. Return ONLY valid JSON array: [{"question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..."}]. correctAnswer is 0-indexed. No other text.`,
+                    message: `Create 5 multiple choice quiz questions for a ${preferences.experienceLevel} student studying ${subjects}. Goals: ${preferences.learningGoals.join(', ')}. Return ONLY valid JSON array: [{"question": "...", "options": ["A", "B", "C", "D"], "correctAnswer": 0, "explanation": "..."}]. correctAnswer is 0-indexed. Content MUST be in ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'}. No other text.`,
                     systemPrompt: 'You are an educational AI. OUTPUT ONLY RAW JSON. NO MARKDOWN. NO BACKTICKS.',
                 }),
             });
@@ -858,7 +869,7 @@ const QuizViewer = ({ preferences }: { preferences: UserPreferences }) => {
 
 // AI Summarizer Component
 const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [topic, setTopic] = useState('');
     const [summary, setSummary] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -875,7 +886,7 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: `${activeMode === 'summary' ? 'Summarize' : activeMode === 'explain' ? 'Explain in detail' : 'Create practice problems for'}: "${topic}". Adapt for a ${preferences.experienceLevel} level ${preferences.learningStyle === 'visual' ? 'visual learner - use bullet points and structure' : preferences.learningStyle === 'hands-on' ? 'hands-on learner - include practical examples' : 'student'}.`,
+                    message: `${activeMode === 'summary' ? 'Summarize' : activeMode === 'explain' ? 'Explain in detail' : 'Create practice problems for'}: "${topic}". Adapt for a ${preferences.experienceLevel} level ${preferences.learningStyle === 'visual' ? 'visual learner - use bullet points and structure' : preferences.learningStyle === 'hands-on' ? 'hands-on learner - include practical examples' : 'student'}. The response MUST be in ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'} language.`,
                     systemPrompt: `You are an educational AI assistant helping ${preferences.name}. Their goals are: ${preferences.learningGoals.join(', ')}. Make content engaging and clear.`,
                 }),
             });
@@ -974,7 +985,7 @@ const SummarizerTool = ({ preferences }: { preferences: UserPreferences }) => {
 // AI-Powered Course Recommendations - Recommends 3 real courses from database
 // AI-Powered Course Recommendations - Recommends 3 real courses from database
 const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferences }) => {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const [availableCourses, setAvailableCourses] = useState<any[]>([]);
     const [recommendedCourses, setRecommendedCourses] = useState<any[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<any | null>(null);
@@ -1016,7 +1027,7 @@ const PersonalizedLearningPaths = ({ preferences }: { preferences: UserPreferenc
 
             try {
                 const subjects = preferences.subjects.map(s =>
-                    subjectOptions.find(opt => opt.id === s)?.label || s
+                    t(subjectOptions.find(opt => opt.id === s)?.label || '') || s
                 ).join(', ');
 
                 const courseList = availableCourses.map((c, i) =>
@@ -1048,7 +1059,8 @@ Return ONLY a JSON array with this format:
 RULES:
 - courseIndex must be the number from the list above (1-${availableCourses.length})
 - Pick courses that match their interests and experience level
-- Return ONLY valid JSON, no markdown`,
+- Return ONLY valid JSON, no markdown.
+- The 'reason' field MUST be in ${language === 'ar' ? 'Arabic' : language === 'fr' ? 'French' : 'English'} language.`,
                         systemPrompt: 'You are a course recommendation AI. OUTPUT ONLY RAW JSON. NO MARKDOWN. NO BACKTICKS.',
                     }),
                 });
@@ -1464,7 +1476,7 @@ export default function LearningHubPage() {
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-1">
                             {preferences.hasCompletedOnboarding
-                                ? t('learningHub.subtitle.personal').replace('{level}', preferences.experienceLevel.toLowerCase()).replace('{hours}', preferences.weeklyHours)
+                                ? t('learningHub.subtitle.personal').replace('{level}', t(experienceLevels.find(l => l.id === preferences.experienceLevel)?.label || '').toLowerCase()).replace('{hours}', t(weeklyHoursOptions.find(h => h.id === preferences.weeklyHours)?.label || ''))
                                 : t('learningHub.subtitle.generic')}
                         </p>
                     </div>
@@ -1509,15 +1521,16 @@ export default function LearningHubPage() {
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50">
+                            <Card className={clsx(
+                                "bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-gray-200/50 dark:border-gray-700/50 transition-all duration-300",
+                                activeTool === 'assistant' ? "p-0 h-[650px] overflow-hidden" : "p-6"
+                            )}>
                                 {activeTool === 'assistant' && (
-                                    <div className="h-[400px]">
-                                        <AIChat
-                                            embedded
-                                            title={`AI Study Assistant for ${preferences.name}`}
-                                            placeholder="Ask me anything about your studies..."
-                                        />
-                                    </div>
+                                    <AIChat
+                                        embedded
+                                        title={t('learningHub.aiAssistantTitle').replace('{name}', preferences.name)}
+                                        placeholder={t('aiChat.chat.placeholder')}
+                                    />
                                 )}
                                 {activeTool === 'flashcards' && (
                                     <FlashcardViewer preferences={preferences} />
@@ -1531,19 +1544,21 @@ export default function LearningHubPage() {
                             </Card>
                         </motion.div>
                     )}
-                </AnimatePresence>
+                </AnimatePresence >
 
                 {/* Personalized Learning Paths */}
-                {preferences.hasCompletedOnboarding && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                    >
-                        <PersonalizedLearningPaths preferences={preferences} />
-                    </motion.div>
-                )}
-            </motion.div>
+                {
+                    preferences.hasCompletedOnboarding && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            <PersonalizedLearningPaths preferences={preferences} />
+                        </motion.div>
+                    )
+                }
+            </motion.div >
         </>
     );
 }

@@ -175,7 +175,10 @@ export const AIChat = forwardRef<AIChatHandle, AIChatProps>(({
                 : 'fixed bottom-4 right-4 w-96 h-[600px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50'
         )}>
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-pink-600 text-white rounded-t-xl shrink-0">
+            <div className={clsx(
+                "flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-pink-600 text-white shrink-0",
+                !embedded && "rounded-t-xl"
+            )}>
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
                         <Sparkles className="w-5 h-5" />

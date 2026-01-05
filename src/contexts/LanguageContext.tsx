@@ -1715,6 +1715,7 @@ export const translations: Translations = {
     'learningHub.subtitle.personal': { en: 'Personalized {level} learning', ar: 'تعلم {level} مخصص', fr: 'Apprentissage {level} personnalisé' },
     'learningHub.subtitle.generic': { en: 'Personalized learning powered by artificial intelligence', ar: 'تعلم مخصص مدعوم بالذكاء الاصطناعي', fr: 'Apprentissage personnalisé propulsé par l\'IA' },
     'learningHub.updatePreferences': { en: 'Update Preferences', ar: 'تحديث التفضيلات', fr: 'Mettre à jour les préférences' },
+    'learningHub.aiAssistantTitle': { en: 'AI Study Assistant for {name}', ar: 'مساعد الدراسة الذكي لـ {name}', fr: 'Assistant d\'étude IA pour {name}' },
 
     // Onboarding
     'onboarding.welcome': { en: 'Welcome to AI Learning Hub!', ar: 'مرحباً بك في مركز التعلم الذكي!', fr: 'Bienvenue au Centre d\'apprentissage IA !' },
@@ -2084,6 +2085,38 @@ export const translations: Translations = {
         ar: 'بناء ومشاركة محفظتك المهنية مع المؤهلات الموثقة',
         fr: 'Créez et partagez votre portfolio professionnel avec des informations d\'identification vérifiées',
     },
+
+    // Learning Hub - Subjects
+    'learningHub.subjects.machineLearning': { en: 'Machine Learning', ar: 'تعلم الآلة', fr: 'Apprentissage automatique' },
+    'learningHub.subjects.dataScience': { en: 'Data Science', ar: 'علم البيانات', fr: 'Science des données' },
+    'learningHub.subjects.programming': { en: 'Programming', ar: 'البرمجة', fr: 'Programmation' },
+    'learningHub.subjects.mathematics': { en: 'Mathematics', ar: 'الرياضيات', fr: 'Mathématiques' },
+    'learningHub.subjects.languages': { en: 'Languages', ar: 'اللغات', fr: 'Langues' },
+    'learningHub.subjects.design': { en: 'Design', ar: 'التصميم', fr: 'Design' },
+    'learningHub.subjects.music': { en: 'Music', ar: 'الموسيقى', fr: 'Musique' },
+    'learningHub.subjects.naturalSciences': { en: 'Natural Sciences', ar: 'العلوم الطبيعية', fr: 'Sciences naturelles' },
+    'learningHub.subjects.healthMedicine': { en: 'Health & Medicine', ar: 'الصحة والطب', fr: 'Santé et Médecine' },
+    'learningHub.subjects.businessFinance': { en: 'Business & Finance', ar: 'الأعمال والمالية', fr: 'Affaires et Finance' },
+
+    // Learning Hub - Goals
+    'learningHub.goals.masterSkill': { en: 'Master a new skill', ar: 'إتقان مهارة جديدة', fr: 'Maîtriser une compétence' },
+    'learningHub.goals.advanceCareer': { en: 'Advance my career', ar: 'تعزيز مساري المهني', fr: 'Avancer ma carrière' },
+    'learningHub.goals.academicExcellence': { en: 'Academic excellence', ar: 'التفوق الأكاديمي', fr: 'Excellence académique' },
+    'learningHub.goals.personalInterest': { en: 'Personal interest', ar: 'اهتمام شخصي', fr: 'Intérêt personnel' },
+    'learningHub.goals.prepareExams': { en: 'Prepare for exams', ar: 'التحضير للامتحانات', fr: 'Préparer des examens' },
+    'learningHub.goals.buildProjects': { en: 'Build projects', ar: 'بناء مشاريع', fr: 'Construire des projets' },
+
+    // Learning Hub - Experience
+    'learningHub.experience.Beginner': { en: 'Beginner', ar: 'مبتدئ', fr: 'Débutant' },
+    'learningHub.experience.Intermediate': { en: 'Intermediate', ar: 'متوسط', fr: 'Intermédiaire' },
+    'learningHub.experience.Advanced': { en: 'Advanced', ar: 'متقدم', fr: 'Avancé' },
+    'learningHub.experience.Expert': { en: 'Expert', ar: 'خبير', fr: 'Expert' },
+
+    // Learning Hub - Hours
+    'learningHub.hours.1-3': { en: '1-3 hours', ar: '1-3 ساعات', fr: '1-3 heures' },
+    'learningHub.hours.4-7': { en: '4-7 hours', ar: '4-7 ساعات', fr: '4-7 heures' },
+    'learningHub.hours.8-15': { en: '8-15 hours', ar: '8-15 ساعة', fr: '8-15 heures' },
+    'learningHub.hours.15+': { en: '15+ hours', ar: '15+ ساعة', fr: '15+ heures' },
 };
 
 interface LanguageContextType {
