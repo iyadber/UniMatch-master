@@ -1,6 +1,6 @@
 // Gemini AI client library
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyA_h71I8EXjRpjadzoTNza2FqyxPIyGf8Y';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDrhYPLae4yQ4AOJ5JJ8BVQy7jdcaRN0BE';
 const MODELS = ['models/gemini-3-flash-preview', 'models/gemini-flash-lite-latest'];
 
 export interface GeminiMessage {
